@@ -17,9 +17,9 @@
 .status-item { padding: 14px 20px; border-bottom: 1px solid var(--module-bg); display: flex; gap: 10px; align-items: flex-start; }
 .status-item:last-child { border-bottom: none; }
 .status-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.status-item .si-title { font-family: var(--font-mono); font-size: 11px; font-weight: 500; display: block; margin-bottom: 3px; }
-.status-item .si-desc { font-size: 11px; color: var(--ink-muted); line-height: 1.5; }
-.status-item .si-metric { font-family: var(--font-mono); font-size: 10px; font-weight: 400; color: var(--amber); display: block; margin-top: 2px; }
+.si-title { font-family: var(--font-mono); font-size: 11px; font-weight: 500; display: block; margin-bottom: 3px; }
+.si-desc { font-size: 11px; color: var(--ink-muted); line-height: 1.5; }
+.si-metric { font-family: var(--font-mono); font-size: 10px; font-weight: 400; color: var(--amber); display: block; margin-top: 2px; }
 @media (max-width: 1024px) { .status-4col { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) { .status-4col { grid-template-columns: 1fr; } }
 </style>
@@ -31,174 +31,73 @@
   <div class="page-title">Project <em>Status</em></div>
 </div>
 
-<!-- Status Grid -->
 <section class="section-sm">
   <div class="container">
-    <p class="section-label">Current State — 2026-06-01</p>
-    <div class="status-4col reveal">
-
-      <!-- Working -->
-      <div class="status-col">
-        <div class="status-col-header">
-          <span class="badge active">Working</span>
-          <h3>What's Working</h3>
-        </div>
-        <ul class="status-items">
-          <li class="status-item">
-            <div class="status-icon">✓</div>
-            <div><span class="si-title">ADX+MOM20 Gate — Confirmed</span><span class="si-desc">Upgraded from VIX20+MOM20. PSR=1.000, fire rate 17% (was 37%), OOS CAGR +14.6% (was +7.4%). Full portfolio: CAGR +21.6%, Sharpe 1.18, MaxDD −25.9%, ₹82L. Gate-off now earns risk-free (was 1× — hidden bug fixed).</span><span class="si-metric">Sharpe 1.06 sector · 1.18 full portfolio · PSR=1.000</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✓</div>
-            <div><span class="si-title">Weekly Directional ADX33</span><span class="si-desc">New signal set (RSI5+EMA200+crude+PCR+US10Y) with ADX≥33 gate. Sharpe held IS→OOS. Under surveillance — need 2–3 more years to confirm.</span><span class="si-metric">Sharpe 2.07 IS → 2.06 OOS · n=39</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✓</div>
-            <div><span class="si-title">Sector RS Rate-Shock Gate</span><span class="si-desc">Replaced overfit yield-level rule (4.2%) with sector-RS gate: IT 20d underperformance + rate acceleration. Fires 46% of 2022, 0% of 2023, 6.5% of 2024.</span><span class="si-metric">Generalised · replaces 2022-tuned rule</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✓</div>
-            <div><span class="si-title">Straddle LIVE — June 1 Entry</span><span class="si-desc">First paper straddle active. Entry Jun 1, spot 23,560, premium 946 pts (4.01%). Expiry Jun 25. 7-gate check: all passed at entry (VIX, FII, VRP=+15.12, ATR, rate, mom_bleed, calendar). Gates synced with gate_monitor.py — now 7 gates (was 5).</span><span class="si-metric">946 pts entry · exp Jun 25 · 7-gate system</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✓</div>
-            <div><span class="si-title">Paper Trader Live</span><span class="si-desc">Running since 2026-05-30. Sector gate FLAT (ADX avg 0.32 &lt; 0.40 — choppy regime, earning risk-free). Straddle active. Options idle (ADX &lt; 33).</span><span class="si-metric">NAV 98.11 · sector flat · straddle live</span></div>
-          </li>
-        </ul>
+    <p class="section-label" id="status-date-label">Current State</p>
+    <div class="status-4col reveal" id="status-grid">
+      <div class="status-col" style="grid-column:1/-1;">
+        <div style="padding:32px;color:var(--ink-muted);font-family:var(--font-mono);font-size:11px;">Loading…</div>
       </div>
-
-      <!-- Not Working -->
-      <div class="status-col">
-        <div class="status-col-header">
-          <span class="badge fail">Failed</span>
-          <h3>What's Not Working</h3>
-        </div>
-        <ul class="status-items">
-          <li class="status-item">
-            <div class="status-icon">✗</div>
-            <div><span class="si-title">Weekly Dir S5 (no ADX)</span><span class="si-desc">Regime-specific: built on 2019–2021 low-vol market structure. IS Sharpe 1.58 → OOS -0.91. 157% IS→OOS collapse. Retired.</span><span class="si-metric">IS 1.58 → OOS −0.91</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✗</div>
-            <div><span class="si-title">Causal Signal Filters</span><span class="si-desc">VIX+causal Sharpe -0.52 vs VIX+MOM20 +1.08. 368 signals tested — only 11 pass p&lt;0.05 (3% hit rate). Causal filters actively hurt performance. Dropped.</span><span class="si-metric">Sharpe −0.52 · 3% significance rate</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✗</div>
-            <div><span class="si-title">Sector Rotation Exclusions</span><span class="si-desc">Dropping IT/pharma in rate shock trained on single 2022 episode. Actual 2022 performance: rotation 4.6% vs baseline 6.6%. Exclusion logic underperformed buy-and-hold.</span><span class="si-metric">Overfit · baseline beat rotation in 2022</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✗</div>
-            <div><span class="si-title">576-Parameter Grid</span><span class="si-desc">Straddle param grid CV=126% across combinations. Best combos have 9 trades — statistically meaningless. No IS/OOS declaration during search. Shelved.</span><span class="si-metric">CV 126% · Sharpe range [−1.91, +0.57]</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">✗</div>
-            <div><span class="si-title">No Bear/Rate-Shock Strategy</span><span class="si-desc">In rate-shock (2022): best strategy was DUAL_MOM at Sharpe 0.82 — barely above cash. In prolonged bear (china crash 2015): everything collapses, best was -0.95. Gap not filled.</span><span class="si-metric">No validated bear strategy exists</span></div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Shortcomings -->
-      <div class="status-col">
-        <div class="status-col-header">
-          <span class="badge warn">Risks</span>
-          <h3>Known Risks</h3>
-        </div>
-        <ul class="status-items">
-          <li class="status-item">
-            <div class="status-icon">△</div>
-            <div><span class="si-title">Pre-2017 Data Quality</span><span class="si-desc">NSE options 80–90% zero-volume pre-2017. Straddle backtest uses theoretical settle prices — unrealisable fills. Pre-2017 results overstate true edge by unknown amount.</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">△</div>
-            <div><span class="si-title">GMM Feature Bug (Fixed)</span><span class="si-desc">NIFTY sector rows had null vol_regime/vix_level_z. drop_duplicates kept null rows, degrading GMM training silently. Fixed: filter to nsebank rows before dedup.</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">△</div>
-            <div><span class="si-title">ADX Starved of Entries</span><span class="si-desc">ADX≥33 gate fires ~7×/yr in 2024–2026 vs ~18×/yr in 2022–23. Market structure change (low-ADX grinding) means weekly directional rarely gets a valid entry window.</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">△</div>
-            <div><span class="si-title">FII Data Gap Q1-2023</span><span class="si-desc">FII historical data starts 2023-04-03 but FII gate activates 2023-01-01. Fixed via fillna→pass for NaN. No longer blocks Jan–Mar 2023 trades incorrectly.</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">△</div>
-            <div><span class="si-title">No Live Execution</span><span class="si-desc">All results paper-only. Live slippage, margin, and execution risk not captured. Paper validation must run 18–24 months before any live capital.</span></div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Next Steps -->
-      <div class="status-col">
-        <div class="status-col-header">
-          <span class="badge research">Next Steps</span>
-          <h3>What to Build Next</h3>
-        </div>
-        <ul class="status-items">
-          <li class="status-item">
-            <div class="status-icon">→</div>
-            <div><span class="si-title">Bear / Rate-Shock Strategy</span><span class="si-desc">Biggest gap: no validated strategy survives prolonged bear. DUAL_MOM performed best in 2022 (Sh=0.82) — needs proper IS/OOS validation and regime-conditional routing.</span><span class="si-metric">Priority 1 · critical gap</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">→</div>
-            <div><span class="si-title">Straddle Paper Phase</span><span class="si-desc">Rate shock cleared. Gates passing. Begin paper straddle July 6, 2026. Track 18–24 months at 5% Kelly. Document all gate decisions and exit reasons.</span><span class="si-metric">Start: July 6, 2026</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">→</div>
-            <div><span class="si-title">MOM20 OOS Validation</span><span class="si-desc">VIX+MOM20 Sharpe 1.08 IS (2015–2022). No explicit OOS test in 2023+. Needs formal walk-forward test before adding to live system.</span><span class="si-metric">Priority 2 · quick win</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">→</div>
-            <div><span class="si-title">ADX33 Sample Build-Up</span><span class="si-desc">Weekly directional ADX33 variant is promising (Sharpe 2.06 OOS) but n=39 trades. Need 2–3 years accumulation before statistical confidence. Paper trading now.</span><span class="si-metric">Monitor · 2–3 yr horizon</span></div>
-          </li>
-          <li class="status-item">
-            <div class="status-icon">→</div>
-            <div><span class="si-title">Broker API Integration</span><span class="si-desc">Post paper validation: Zerodha/IBKR integration. 5% initial capital. Full size only after 12mo live track record. Not before Q4 2027.</span><span class="si-metric">Post paper · Q4 2027 earliest</span></div>
-          </li>
-        </ul>
-      </div>
-
     </div>
   </div>
 </section>
 
-<!-- Roadmap -->
 <section class="section-sm">
   <div class="container">
     <p class="section-label">Research Roadmap</p>
-    <div class="roadmap reveal">
-      <div class="roadmap-card">
-        <span class="roadmap-num">01</span>
-        <h4>Bear / Rate-Shock Strategy</h4>
-        <p>No validated strategy survives prolonged bear. DUAL_MOM best candidate from 2022 data (Sh=0.82). Needs proper IS/OOS split and regime-routing integration.</p>
-        <span class="effort-tag">critical gap · 1 month</span>
-      </div>
-      <div class="roadmap-card">
-        <span class="roadmap-num">02</span>
-        <h4>Straddle Paper Phase</h4>
-        <p>Rate shock cleared. All gates passing. Begin paper straddle July 6, 2026 at 5% Kelly. Track 18–24 months before live capital.</p>
-        <span class="effort-tag">start July 6 · required gate</span>
-      </div>
-      <div class="roadmap-card">
-        <span class="roadmap-num">03</span>
-        <h4>MOM20 OOS Validation</h4>
-        <p>VIX+MOM20 Sharpe 1.08 IS. No OOS test in 2023+. Walk-forward required before adding to live system.</p>
-        <span class="effort-tag">2 weeks · quick win</span>
-      </div>
-      <div class="roadmap-card">
-        <span class="roadmap-num">04</span>
-        <h4>ADX33 Signal Accumulation</h4>
-        <p>Weekly directional ADX33 showing Sharpe 2.06 OOS but n=39 trades. Paper trade accumulation needed — 2–3 year horizon for statistical confidence.</p>
-        <span class="effort-tag">ongoing · monitor quarterly</span>
-      </div>
-      <div class="roadmap-card">
-        <span class="roadmap-num">05</span>
-        <h4>Live Execution</h4>
-        <p>Broker API integration post paper validation. 5% initial capital. Full size only after 12mo live track record. Q4 2027 earliest.</p>
-        <span class="effort-tag">post paper · Q4 2027</span>
-      </div>
-    </div>
+    <div class="roadmap reveal" id="roadmap-grid"></div>
   </div>
 </section>
 
+<script>
+loadJSON('data_status.json').then(data => {
+  document.getElementById('status-date-label').textContent =
+    'Current State — ' + (data.lastUpdated || new Date().toISOString().slice(0,10));
+
+  const buildCol = (badgeCls, badgeText, heading, items, icon) => `
+    <div class="status-col">
+      <div class="status-col-header">
+        <span class="badge ${badgeCls}">${badgeText}</span>
+        <h3>${heading}</h3>
+      </div>
+      <ul class="status-items">
+        ${(items||[]).map(item => `
+          <li class="status-item">
+            <div class="status-icon">${icon}</div>
+            <div>
+              <span class="si-title">${item.title}</span>
+              <span class="si-desc">${item.desc}</span>
+              ${item.metric ? '<span class="si-metric">'+item.metric+'</span>' : ''}
+            </div>
+          </li>`).join('')}
+      </ul>
+    </div>`;
+
+  document.getElementById('status-grid').innerHTML =
+    buildCol('active',   'Working',    "What's Working",      data.working||[], '✓') +
+    buildCol('fail',     'Failed',     "What's Not Working",  data.failed||[], '✗') +
+    buildCol('warn',     'Risks',      'Known Risks',         data.risks||[], '△') +
+    buildCol('research', 'Next Steps', 'What to Build Next',  data.next||[], '→');
+
+  document.getElementById('roadmap-grid').innerHTML = (data.roadmap||[]).map(r => `
+    <div class="roadmap-card">
+      <span class="roadmap-num">${r.num}</span>
+      <h4>${r.title}</h4>
+      <p>${r.desc}</p>
+      <span class="effort-tag">${r.effort}</span>
+    </div>`).join('');
+
+}).catch(() => {
+  document.getElementById('status-date-label').textContent = 'Status — data_status.json not found';
+  document.getElementById('status-grid').innerHTML = `
+    <div class="status-col" style="grid-column:1/-1;">
+      <div style="padding:32px;">
+        <p style="font-family:var(--font-mono);font-size:12px;color:var(--red);">Could not load data_status.json</p>
+        <p style="font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);margin-top:8px;">
+          Run <code>python update_status.py touch</code> or ensure data_status.json exists alongside status.html.</p>
+      </div>
+    </div>`;
+});
+</script>
 </body>
 </html>

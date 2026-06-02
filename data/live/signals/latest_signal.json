@@ -1,0 +1,168 @@
+{
+  "date": "2026-05-28",
+  "generated_at": "2026-05-28T13:32:43.560834",
+  "regime": {
+    "regime": 3,
+    "label": "R3_RATE_SHOCK",
+    "confidence": 0.7288,
+    "gmm_probs": {
+      "R0": 0.0041,
+      "R1": 0.8661,
+      "R2": 0.1298
+    },
+    "knn_conf": 0.7288,
+    "rate_shock": true,
+    "regime_date": "2026-05-26",
+    "position_note": "R3 RATE_SHOCK: restricted to nsebank/energy/fmcg"
+  },
+  "sector_weights": {
+    "nsebank": {
+      "invest": false,
+      "vix_gate_ok": false,
+      "regime_ok": true,
+      "action": "FLAT"
+    },
+    "cnxit": {
+      "invest": false,
+      "vix_gate_ok": true,
+      "regime_ok": false,
+      "action": "FLAT"
+    },
+    "cnxenergy": {
+      "invest": true,
+      "vix_gate_ok": true,
+      "regime_ok": true,
+      "action": "INVEST_2X"
+    },
+    "cnxfmcg": {
+      "invest": false,
+      "vix_gate_ok": false,
+      "regime_ok": true,
+      "action": "FLAT"
+    },
+    "cnxpharma": {
+      "invest": false,
+      "vix_gate_ok": true,
+      "regime_ok": false,
+      "action": "FLAT"
+    }
+  },
+  "straddle": {
+    "vix_gate": true,
+    "rate_shock_gate": false,
+    "us10y_60d_cum": 0.1104,
+    "mom_bleed_gate": false,
+    "mom_60d": -0.0602,
+    "vrp_positive": false,
+    "straddle_eligible": false,
+    "next_eligible_months": [
+      {
+        "month": "2026-05",
+        "entry_date": "2026-05-04",
+        "rbi_blocked": false,
+        "eligible": true,
+        "note": "CLEAR"
+      },
+      {
+        "month": "2026-07",
+        "entry_date": "2026-07-06",
+        "rbi_blocked": false,
+        "eligible": true,
+        "note": "CLEAR"
+      },
+      {
+        "month": "2026-09",
+        "entry_date": "2026-09-07",
+        "rbi_blocked": false,
+        "eligible": true,
+        "note": "CLEAR"
+      }
+    ]
+  },
+  "straddle_calendar_12m": [
+    {
+      "month": "2026-05",
+      "entry_date": "2026-05-04",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    },
+    {
+      "month": "2026-06",
+      "entry_date": "2026-06-01",
+      "rbi_blocked": true,
+      "eligible": false,
+      "note": "RBI meeting month \u2014 elevated event risk"
+    },
+    {
+      "month": "2026-07",
+      "entry_date": "2026-07-06",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    },
+    {
+      "month": "2026-08",
+      "entry_date": "2026-08-03",
+      "rbi_blocked": true,
+      "eligible": false,
+      "note": "RBI meeting month \u2014 elevated event risk"
+    },
+    {
+      "month": "2026-09",
+      "entry_date": "2026-09-07",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    },
+    {
+      "month": "2026-10",
+      "entry_date": "2026-10-05",
+      "rbi_blocked": true,
+      "eligible": false,
+      "note": "RBI meeting month \u2014 elevated event risk"
+    },
+    {
+      "month": "2026-11",
+      "entry_date": "2026-11-02",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    },
+    {
+      "month": "2026-12",
+      "entry_date": "2026-12-07",
+      "rbi_blocked": true,
+      "eligible": false,
+      "note": "RBI meeting month \u2014 elevated event risk"
+    },
+    {
+      "month": "2027-01",
+      "entry_date": "2027-01-04",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    },
+    {
+      "month": "2027-02",
+      "entry_date": "2027-02-01",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    },
+    {
+      "month": "2027-03",
+      "entry_date": "2027-03-01",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    },
+    {
+      "month": "2027-04",
+      "entry_date": "2027-04-05",
+      "rbi_blocked": false,
+      "eligible": true,
+      "note": "CLEAR"
+    }
+  ]
+}

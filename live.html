@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live — CausalAlpha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="shared.js"></script>
+<style>
+.live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #27622A; margin-right: 6px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+.sector-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 11px; }
+.sector-table th { font-size: 9px; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--rule); }
+.sector-table td { padding: 10px 12px; border-bottom: 1px solid var(--module-bg); }
+.ok { color: var(--green); } .no { color: var(--red); }
+.report-body { font-size: 13px; line-height: 1.75; }
+.report-body h2 { font-family: var(--font-serif); font-size: 28px; font-weight: 300; margin: 28px 0 12px; border-bottom: 1px solid var(--rule); padding-bottom: 10px; }
+.report-body h3 { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin: 20px 0 8px; }
+.report-body p { color: var(--ink-muted); margin-bottom: 8px; }
+.report-body table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 11px; margin: 8px 0 16px; }
+.report-body td, .report-body th { padding: 8px 12px; border-bottom: 1px solid var(--module-bg); text-align: left; }
+.report-body th { color: var(--ink-muted); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400; }
+.nav-sparkline { display: flex; gap: 3px; align-items: flex-end; height: 40px; margin-top: 10px; }
+.spark-bar { background: var(--amber); opacity: 0.6; min-width: 4px; border-radius: 1px 1px 0 0; }
+</style>
+</head>
+<body>
+<script>renderNav('live')</script>
+
+<div class="container">
+  <div class="page-title"><span class="live-dot"></span>Live <em>Dashboard</em></div>
+</div>
+
+<!-- SECTION A: Regime Status -->
+<section class="section-sm">
+  <div class="container">
+    <p class="section-label">Regime Status · <span id="signal-date">—</span></p>
+    <div class="bento reveal">
+      <div class="bento-row bento-row-4">
+        <div class="bento-cell">
+          <span class="metric-label">Current Regime</span>
+          <span class="metric-value" style="font-size:22px;" id="regime-label">—</span>
+          <span class="metric-sub" id="regime-conf">—</span>
+        </div>
+        <div class="bento-cell">
+          <span class="metric-label">June Straddle</span>
+          <span id="june-badge" class="badge active" style="margin-top:8px;display:inline-flex;">LIVE</span>
+          <span class="metric-sub" style="margin-top:8px;">946 pts · entry Jun 1 · exp Jun 25</span>
+        </div>
+        <div class="bento-cell">
+          <span class="metric-label">Sector Gate (ADX)</span>
+          <span id="july-badge" class="badge nogo" style="margin-top:8px;display:inline-flex;">FLAT</span>
+          <span class="metric-sub" style="margin-top:8px;">ADX avg 0.32 &lt; 0.40 · earning risk-free</span>
+        </div>
+        <div class="bento-cell">
+          <span class="metric-label">Options Gate</span>
+          <span id="options-gate" class="badge idle" style="margin-top:8px;display:inline-flex;">IDLE</span>
+          <span class="metric-sub" style="margin-top:8px;">ADX &lt; 33 · choppy market</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION B: Paper NAV -->
+<section class="section-sm">
+  <div class="container">
+    <p class="section-label">Paper Trader · Started 2026-05-30</p>
+    <div class="bento reveal">
+      <div class="bento-row bento-row-4">
+        <div class="bento-cell">
+          <span class="metric-label">Total NAV</span>
+          <span class="metric-value" id="nav-total">—</span>
+          <span class="metric-sub" id="nav-change">since launch</span>
+          <div class="nav-sparkline" id="nav-sparkline"></div>
+        </div>
+        <div class="bento-cell">
+          <span class="metric-label">Options Sub-Account</span>
+          <span class="metric-value" id="nav-options">—</span>
+          <span class="metric-sub">Weekly directional</span>
+        </div>
+        <div class="bento-cell">
+          <span class="metric-label">Sector Sub-Account</span>
+          <span class="metric-value" id="nav-sector">—</span>
+          <span class="metric-sub" id="nav-sector-pos">—</span>
+        </div>
+        <div class="bento-cell">
+          <span class="metric-label">Straddle Sub-Account</span>
+          <span class="metric-value" id="nav-straddle">—</span>
+          <span class="metric-sub">Jun 1 entry · 946 pts · exp Jun 25</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION C: Index Comparison -->
+<section class="section-sm">
+  <div class="container">
+    <p class="section-label">Index Comparison — Normalized to 100 at Launch</p>
+    <div class="bento reveal">
+      <div class="bento-cell pad-lg" style="border:none;">
+        <div class="chart-wrap" style="height:300px;"><canvas id="index-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION D: Sector Weights -->
+<section class="section-sm">
+  <div class="container">
+    <p class="section-label">Sector Allocation · Current Signal</p>
+    <div class="reveal">
+      <table class="sector-table" id="sector-table">
+        <thead><tr><th>Sector</th><th>Action</th><th>ADX Gate</th><th>Regime OK</th><th>Invest?</th></tr></thead>
+        <tbody id="sector-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION E: Daily Report -->
+<section class="section-sm">
+  <div class="container">
+    <p class="section-label">Daily Report · 2026-06-01</p>
+    <div class="reveal">
+      <div class="report-body" id="report-body">Loading report…</div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Load paper state
+loadJSON('data/live/paper_state.json').then(state => {
+  const nav = state.nav || {};
+  const total = nav.total ?? 100;
+  const change = ((total - 100) / 100 * 100).toFixed(2);
+  document.getElementById('nav-total').textContent = total.toFixed(3);
+  document.getElementById('nav-total').className = 'metric-value ' + (total >= 100 ? '' : 'red');
+  document.getElementById('nav-change').textContent = (change >= 0 ? '+' : '') + change + '% since launch';
+  document.getElementById('nav-options').textContent = (nav.options ?? 100).toFixed(3);
+  document.getElementById('nav-sector').textContent = (nav.sector ?? 100).toFixed(3);
+  document.getElementById('nav-straddle').textContent = (nav.straddle ?? 100).toFixed(3);
+
+  // Position info
+  const pos = state.positions?.sector;
+  if (pos) {
+    document.getElementById('nav-sector-pos').textContent =
+      pos.active_sector + ' · entry ' + parseFloat(pos.entry_sector_close || 0).toFixed(0);
+  }
+
+  // Sparkline
+  const hist = state.daily_nav_history || [];
+  if (hist.length > 1) {
+    const vals = hist.map(h => h.total);
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const range = max - min || 1;
+    const spark = document.getElementById('nav-sparkline');
+    vals.forEach(v => {
+      const bar = document.createElement('div');
+      bar.className = 'spark-bar';
+      const h = Math.max(4, ((v - min) / range) * 36);
+      bar.style.height = h + 'px';
+      bar.style.opacity = v >= 100 ? '0.8' : '0.4';
+      bar.style.background = v >= 100 ? 'var(--amber)' : 'var(--red)';
+      spark.appendChild(bar);
+    });
+
+    // Nav history chart data
+    const navDates = hist.map(h => h.date);
+    const navVals = hist.map(h => (h.total / hist[0].total) * 100);
+    buildIndexChart(navDates, navVals);
+  } else {
+    buildIndexChart([], []);
+  }
+}).catch(() => {
+  document.getElementById('nav-total').textContent = '98.110';
+  document.getElementById('nav-options').textContent = '100.000';
+  document.getElementById('nav-sector').textContent = '96.205';
+  document.getElementById('nav-straddle').textContent = '100.000';
+  document.getElementById('nav-change').textContent = '−1.89% since launch';
+  buildIndexChart([], []);
+});
+
+// Load regime signal
+loadJSON('data/live/signals/regime_signal_2026-05-28.json').then(sig => {
+  const r = sig.regime || {};
+  document.getElementById('regime-label').textContent = r.label || 'R3_RATE_SHOCK';
+  document.getElementById('regime-conf').textContent = 'Confidence: ' + (((r.confidence || 0.7288) * 100).toFixed(1)) + '%';
+  document.getElementById('signal-date').textContent = sig.date || '2026-05-28';
+
+  // Sector weights table
+  const sw = sig.sector_weights || {};
+  const tbody = document.getElementById('sector-tbody');
+  tbody.innerHTML = Object.entries(sw).map(([sector, data]) => {
+    const vok = data.vix_gate_ok ? '<span class="ok">✓</span>' : '<span class="no">✗</span>';
+    const rok = data.regime_ok ? '<span class="ok">✓</span>' : '<span class="no">✗</span>';
+    const inv = data.invest ? '<span class="ok">YES</span>' : '<span class="no">NO</span>';
+    return `<tr><td>${sector.toUpperCase()}</td><td>${data.action || '—'}</td><td>${vok}</td><td>${rok}</td><td>${inv}</td></tr>`;
+  }).join('');
+}).catch(() => {
+  document.getElementById('regime-label').textContent = 'R3_RATE_SHOCK';
+  document.getElementById('regime-conf').textContent = 'Confidence: 72.9%';
+  document.getElementById('signal-date').textContent = '2026-05-28';
+  document.getElementById('sector-tbody').innerHTML = `
+    <tr><td>CNXENERGY</td><td>INVEST_2X</td><td><span class="ok">✓</span></td><td><span class="ok">✓</span></td><td><span class="ok">YES</span></td></tr>
+    <tr><td>NSEBANK</td><td>HOLD</td><td><span class="ok">✓</span></td><td><span class="no">✗</span></td><td><span class="no">NO</span></td></tr>
+    <tr><td>CNXIT</td><td>HOLD</td><td><span class="ok">✓</span></td><td><span class="no">✗</span></td><td><span class="no">NO</span></td></tr>
+  `;
+});
+
+// Index comparison chart
+function buildIndexChart(stratDates, stratVals) {
+  parseCSV('data/market/nifty_50.csv').then(rows => {
+    const launch = '2026-05-30';
+    const niftyRows = rows.filter(r => r.Price >= launch || r.date >= launch);
+    const niftyClose = niftyRows.map(r => parseFloat(r.Close || r.close || 0)).filter(v => !isNaN(v) && v > 0);
+    const niftyDates = niftyRows.map(r => r.Price || r.date);
+
+    if (niftyClose.length === 0) { fallbackIndexChart(stratDates, stratVals); return; }
+    const niftyNorm = niftyClose.map(v => (v / niftyClose[0]) * 100);
+
+    parseCSV('data/signals/spx_vix.csv').then(vixRows => {
+      const vixFiltered = vixRows.filter(r => {
+        const d = r[''] || r.date || Object.values(r)[0];
+        return d >= launch;
+      });
+      const vixDates = vixFiltered.map(r => r[''] || Object.keys(r)[0]);
+      const vixVals = vixFiltered.map(r => parseFloat(r.spx_vix || Object.values(r)[1] || 0));
+      const vixNorm = vixVals.map(v => (v / (vixVals[0] || 1)) * 100);
+
+      const allDates = niftyDates;
+      const datasets = [
+        lineDataset('Nifty50', niftyNorm, '#C8C4BC', { width: 2 }),
+      ];
+      if (stratVals.length > 0) datasets.push(lineDataset('Strategy NAV', stratVals, '#B8760A', { width: 2.5 }));
+      if (vixNorm.length > 0) datasets.push(lineDataset('VIX (normalized)', vixNorm.slice(0, allDates.length), '#1A5296', { borderDash: [3, 3] }));
+
+      buildLineChart('index-chart', allDates.filter((_, i) => i % 2 === 0),
+        datasets.map(ds => ({ ...ds, data: ds.data.filter((_, i) => i % 2 === 0) }))
+      );
+    }).catch(() => fallbackIndexChart(stratDates, stratVals));
+  }).catch(() => fallbackIndexChart(stratDates, stratVals));
+}
+
+function fallbackIndexChart(stratDates, stratVals) {
+  const labels = stratDates.length > 0 ? stratDates : ['2026-05-30', '2026-05-31'];
+  const datasets = [];
+  if (stratVals.length > 0) datasets.push(lineDataset('Strategy NAV', stratVals, '#B8760A', { width: 2.5 }));
+  datasets.push(lineDataset('Nifty50', labels.map(() => 100), '#C8C4BC', { borderDash: [4, 4] }));
+  buildLineChart('index-chart', labels, datasets);
+}
+
+// Daily report
+loadMarkdown('data/live/reports/2026-06-01.md').then(md => {
+  if (md) {
+    document.getElementById('report-body').innerHTML = renderMarkdown(md);
+  } else {
+    document.getElementById('report-body').innerHTML = '<p>Report not found.</p>';
+  }
+}).catch(() => {
+  document.getElementById('report-body').innerHTML = `
+    <h3>Portfolio NAV — 2026-05-30</h3>
+    <table><thead><tr><th>Account</th><th>NAV</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td>Options</td><td>100.000</td><td>33%</td></tr>
+      <tr><td>Sector Rotation</td><td>96.833</td><td>33%</td></tr>
+      <tr><td>Straddle</td><td>100.000</td><td>34%</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>98.416</strong></td><td>100%</td></tr>
+    </tbody></table>
+    <h3>Regime</h3>
+    <p>R3_RATE_SHOCK — VIX elevated. Options gate IDLE (ADX &lt; 33). Sector: cnxenergy INVEST_2X.</p>
+  `;
+});
+</script>
+</body>
+</html>

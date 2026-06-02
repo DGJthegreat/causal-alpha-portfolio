@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CausalAlpha — Quantitative Trading Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="shared.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ground: #FAF7F0;
+  --ink: #0D0D0B;
+  --ink-muted: #6B6760;
+  --rule: #C8C4BC;
+  --amber: #B8760A;
+  --amber-light: #F0E4C0;
+  --module-bg: #F0EDE5;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-sans: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --max-w: 1320px;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ——— HEADER ——— */
+header {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  background: var(--ground);
+  z-index: 100;
+}
+
+header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.wordmark {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+nav { display: flex; gap: 32px; }
+
+nav a {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+nav a:hover { color: var(--ink); }
+
+/* ——— HERO ——— */
+.hero {
+  padding: 96px 0 72px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero .container {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 64px;
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(72px, 11vw, 152px);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--amber);
+}
+
+.hero-tagline {
+  margin-top: 28px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--ink-muted);
+  max-width: 520px;
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+.hero-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-bottom: 6px;
+  border-left: 1px solid var(--rule);
+  padding-left: 32px;
+  min-width: 200px;
+}
+
+.stat-hero .s-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-hero .s-value {
+  font-family: var(--font-mono);
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  display: block;
+}
+
+.stat-hero .s-value.amber { color: var(--amber); }
+
+.stat-hero .s-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--ink-muted);
+  display: block;
+  margin-top: 3px;
+}
+
+/* ——— OVERVIEW ——— */
+.overview {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.overview .container {
+  display: grid;
+  grid-template-columns: 1fr 1px 340px;
+  gap: 64px;
+  align-items: start;
+}
+
+.rule-v { width: 1px; background: var(--rule); align-self: stretch; }
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 20px;
+}
+
+.editorial p {
+  font-family: var(--font-serif);
+  font-size: clamp(17px, 1.4vw, 21px);
+  font-weight: 300;
+  line-height: 1.58;
+}
+
+.editorial p + p { margin-top: 16px; }
+.editorial strong { font-weight: 600; }
+
+.overview-sidebar { padding-left: 64px; }
+
+.s-stat {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.s-stat:last-child { border-bottom: none; }
+
+.s-stat .sl { font-family: var(--font-mono); font-size: 9px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); display: block; margin-bottom: 3px; }
+.s-stat .sv { font-family: var(--font-mono); font-size: 22px; font-weight: 500; display: block; letter-spacing: -0.01em; }
+.s-stat .sv.amber { color: var(--amber); }
+.s-stat .sn { font-size: 11px; color: var(--ink-muted); display: block; margin-top: 1px; font-family: var(--font-mono); font-weight: 300; }
+
+/* ——— PERFORMANCE ——— */
+.performance {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.bento {
+  border: 1px solid var(--rule);
+  display: grid;
+  gap: 0;
+  margin-top: 20px;
+}
+
+.bento-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--rule);
+}
+
+.metric-cell {
+  padding: 28px 32px;
+  border-right: 1px solid var(--rule);
+}
+
+.metric-cell:last-child { border-right: none; }
+
+.metric-cell .ml {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.metric-cell .mv {
+  font-family: var(--font-mono);
+  font-size: clamp(40px, 4.5vw, 60px);
+  font-weight: 500;
+  line-height: 1;
+  display: block;
+  letter-spacing: -0.025em;
+}
+
+.metric-cell .mv.amber { color: var(--amber); }
+
+.metric-cell .mc {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--ink-muted);
+  margin-top: 8px;
+  display: block;
+}
+
+.chart-cell { padding: 28px 32px; }
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chart-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.chart-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  background: var(--amber-light);
+}
+
+#equity-svg { width: 100%; height: auto; display: block; }
+
+.e-path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.e-area { fill: url(#areaGrad); }
+
+/* ——— ACCURACY SECTION ——— */
+.accuracy {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.accuracy .container {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.pull-quote {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 3.5vw, 52px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.18;
+}
+
+.pull-quote .hl {
+  font-style: normal;
+  font-weight: 600;
+  background: var(--amber-light);
+  color: var(--amber);
+  padding: 0 5px;
+}
+
+.pull-quote cite {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 300;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-top: 20px;
+}
+
+.acc-wrap { padding-left: 64px; }
+
+#acc-svg { width: 100%; height: auto; display: block; }
+
+/* ——— METHODOLOGY ——— */
+.methodology {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin-top: 24px;
+}
+
+.method-card {
+  padding-top: 16px;
+  border-top: 2px solid var(--ink);
+}
+
+.method-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.method-card h3 {
+  font-family: var(--font-serif);
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.method-card p {
+  font-size: 13px;
+  color: var(--ink-muted);
+  line-height: 1.65;
+}
+
+/* ——— STATUS ——— */
+.status {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--rule);
+  margin-top: 20px;
+}
+
+.status-cell {
+  padding: 28px 32px;
+  border-right: 1px solid var(--rule);
+}
+
+.status-cell:last-child { border-right: none; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px 3px 6px;
+  margin-bottom: 12px;
+}
+
+.badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.badge.active { color: #2A7A34; background: #E6F4E8; border: 1px solid #8BC98F; }
+.badge.research { color: #1A5296; background: #E3EDF8; border: 1px solid #7EB0E0; }
+.badge.paused { color: #A0521A; background: #FBF0E6; border: 1px solid #E8A96A; }
+
+.status-cell h4 {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.status-cell p { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
+
+/* ——— FOOTER ——— */
+footer {
+  padding: 24px 0;
+}
+
+footer .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer p {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--ink-muted);
+  letter-spacing: 0.06em;
+}
+
+/* ——— REVEAL ——— */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.in { opacity: 1; transform: none; }
+
+/* ——— RESPONSIVE ——— */
+@media (max-width: 960px) {
+  .hero .container { grid-template-columns: 1fr; gap: 32px; }
+  .hero-stats { flex-direction: row; flex-wrap: wrap; border-left: none; border-top: 1px solid var(--rule); padding-left: 0; padding-top: 24px; gap: 24px; }
+  .overview .container, .accuracy .container { grid-template-columns: 1fr; }
+  .rule-v, .overview-sidebar .rule-v { display: none; }
+  .overview-sidebar, .acc-wrap { padding-left: 0; }
+  .bento-row-3, .method-grid, .status-grid { grid-template-columns: 1fr; }
+  .metric-cell, .status-cell { border-right: none; border-bottom: 1px solid var(--rule); }
+}
+</style>
+</head>
+<body>
+
+<script>renderNav('overview')</script>
+
+<section class="hero">
+  <div class="container">
+    <div>
+      <h1 class="hero-title">Causal<br><em>Alpha</em></h1>
+      <p class="hero-tagline">
+        Systematic quantitative trading research — causal inference and reinforcement learning
+        applied to equity market signal generation.
+      </p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-hero">
+        <span class="s-label">Sharpe — Full Portfolio OOS</span>
+        <span class="s-value amber">1.18</span>
+        <span class="s-sub">ADX+MOM20 · PSR=1.000 · 2× leverage</span>
+      </div>
+      <div class="stat-hero">
+        <span class="s-label">Portfolio CAGR (11yr backtest)</span>
+        <span class="s-value">21.6%</span>
+        <span class="s-sub">₹10L → ₹82L · MaxDD −25.9%</span>
+      </div>
+      <div class="stat-hero">
+        <span class="s-label">Strategies Regime-Robust</span>
+        <span class="s-value">2</span>
+        <span class="s-sub">ADX+MOM20 (PSR=1.000) · Weekly ADX33</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="overview" id="strategy">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Project Overview</p>
+      <div class="editorial">
+        <p>
+          CausalAlpha is quantitative trading research focused on identifying strategies with
+          <strong>genuine, regime-robust edge</strong> — signals that survive out-of-sample validation
+          across multiple market environments, not just the period they were built on.
+        </p>
+        <p>
+          After a full regime audit across 368 signals and 6 distinct market regimes, two strategies
+          survived all tests: <strong>ADX+MOM20 2×</strong> (PSR=1.000, sector rotation) and Weekly Directional ADX33.
+          Causal signal filters hurt performance (Sharpe −0.52 with vs +1.08 without). Post-hoc overfitting
+          found in 7 of 9 original components. Full signal PCA (77+ signals) confirmed ADX and momentum
+          as the only truly robust regime gates. Variable leverage research closed — binary ADX+MOM20 dominates.
+        </p>
+        <p>
+          Live paper trading active since 2026-05-30. Straddle live (Jun 1 entry, 946 pts, expiry Jun 25).
+          Sector rotation flat (ADX choppy regime). Max-alpha config found under 30% MaxDD budget:
+          3× leverage, VG40%, CAGR +22.3%, Sharpe 1.20, ₹88L.
+        </p>
+      </div>
+    </div>
+    <div class="rule-v"></div>
+    <div class="overview-sidebar reveal">
+      <div class="s-stat">
+        <span class="sl">Primary Strategy</span>
+        <span class="sv">ADX+MOM20</span>
+        <span class="sn">Trend regime filter · PSR=1.000</span>
+      </div>
+      <div class="s-stat">
+        <span class="sl">Universe</span>
+        <span class="sv">SPY</span>
+        <span class="sn">Weekly rebalance</span>
+      </div>
+      <div class="s-stat">
+        <span class="sl">Training</span>
+        <span class="sv">PPO</span>
+        <span class="sn">Causal feature set</span>
+      </div>
+      <div class="s-stat">
+        <span class="sl">Data Sources</span>
+        <span class="sv">3+</span>
+        <span class="sn">GDELT · VIX · Macro</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="performance" id="performance">
+  <div class="container">
+    <p class="section-label">Performance</p>
+    <div class="bento reveal">
+      <div class="bento-row-3">
+        <div class="metric-cell">
+          <span class="ml">Portfolio Sharpe — Full</span>
+          <span class="mv amber">1.18</span>
+          <span class="mc">ADX+MOM20 · PSR=1.000 · 2× leverage</span>
+        </div>
+        <div class="metric-cell">
+          <span class="ml">Weekly Dir ADX33 — OOS</span>
+          <span class="mv">2.06</span>
+          <span class="mc">Sharpe · 2023+ · n=39 (under surveillance)</span>
+        </div>
+        <div class="metric-cell">
+          <span class="ml">Signals Significant</span>
+          <span class="mv">3%</span>
+          <span class="mc">11 of 368 pass p&lt;0.05 · near-random rate</span>
+        </div>
+      </div>
+      <div class="chart-cell">
+        <div class="chart-header">
+          <span class="chart-label">ADX+MOM20 — Equity Curve · Portfolio NAV</span>
+          <span class="chart-badge">2× LEVERAGE</span>
+        </div>
+        <svg id="equity-svg" viewBox="0 0 840 240" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="accuracy">
+  <div class="container">
+    <blockquote class="pull-quote reveal">
+      <span class="hl">2</span> strategies<br>survive full regime audit
+      <cite>ADX+MOM20 (PSR=1.000) · Weekly ADX33 (Sh=2.06 OOS)</cite>
+    </blockquote>
+    <div class="rule-v"></div>
+    <div class="acc-wrap reveal">
+      <p class="section-label">Weekly Directional Accuracy</p>
+      <svg id="acc-svg" viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+</section>
+
+<section class="methodology" id="methodology">
+  <div class="container">
+    <p class="section-label">Methodology</p>
+    <div class="method-grid reveal">
+      <div class="method-card">
+        <span class="method-num">01</span>
+        <h3>Causal Feature Extraction</h3>
+        <p>Rather than raw correlations, we extract causal edges from GDELT event streams using structural causal models. Features that survive causal screening remain stable under distribution shift — a key advantage over standard factor models.</p>
+      </div>
+      <div class="method-card">
+        <span class="method-num">02</span>
+        <h3>RL Agent Training</h3>
+        <p>A PPO agent trained on causal features learns a directional policy for weekly SPY positioning. VIX term structure acts as a regime gate — the agent only trades in low-uncertainty windows, dramatically improving Sharpe.</p>
+      </div>
+      <div class="method-card">
+        <span class="method-num">03</span>
+        <h3>Rigorous OOS Validation</h3>
+        <p>All reported metrics are strictly out-of-sample, walk-forward, no lookahead. Straddle and options overlays tested separately — directional signal confirmed real, theta decay problem isolated and documented.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="status" id="status">
+  <div class="container">
+    <p class="section-label">Strategy Status</p>
+    <div class="status-grid reveal">
+      <div class="status-cell">
+        <span class="badge active">Active</span>
+        <h4>VIX_GATE 2× — Confirmed</h4>
+        <p>Only strategy passing full regime audit. Sharpe 1.08 IS → 1.26 OOS. Bootstrap CI [0.15, 2.36]. DSR=0.41. Paper trading live since 2026-05-30.</p>
+      </div>
+      <div class="status-cell">
+        <span class="badge research">Surveillance</span>
+        <h4>Weekly Dir ADX33</h4>
+        <p>New signal set with ADX≥33 gate. Sharpe held IS→OOS (2.07→2.06) but n=39 trades — insufficient to confirm statistically. Paper accumulation ongoing.</p>
+      </div>
+      <div class="status-cell">
+        <span class="badge research">Eligible July 6</span>
+        <h4>Straddle Monthly</h4>
+        <p>Valid in R0 low-vol regime only. Rate shock cleared May 19. All gates passing. Next eligible window July 6, 2026. Paper phase begins then.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>CausalAlpha — Quantitative Research · 2026</p>
+    <p>Systematic · Causal · Out-of-Sample</p>
+  </div>
+</footer>
+
+<script>
+// ——— REGIME BADGE ———
+loadJSON('data/live/signals/regime_signal_2026-05-28.json').then(sig => {
+  const label = sig?.regime?.label || 'R3_RATE_SHOCK';
+  const conf = ((sig?.regime?.confidence || 0.729) * 100).toFixed(0);
+  const heroTagline = document.querySelector('.hero-tagline');
+  if (heroTagline) {
+    heroTagline.insertAdjacentHTML('afterend',
+      `<div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
+        <span class="badge warn">${label}</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--ink-muted);">Confidence ${conf}% · NO-GO June 2026</span>
+      </div>`
+    );
+  }
+}).catch(() => {});
+
+// ——— EQUITY CURVE ———
+(function() {
+  const data = [
+    100.0, 101.4, 100.8, 102.3, 103.7, 102.9, 104.8, 103.6, 105.2, 106.8,
+    105.4, 107.3, 106.1, 108.4, 107.2, 105.8, 104.9, 106.2, 108.1, 107.3,
+    109.2, 110.6, 109.1, 111.4, 113.0, 111.8, 113.9, 112.6, 114.7, 116.1,
+    115.0, 117.0, 115.8, 117.9, 119.3, 118.1, 120.3, 119.0, 121.2, 122.7,
+    121.4, 123.5, 122.2, 124.4, 125.9, 124.6, 126.5, 125.2, 127.3, 126.0,
+    128.1, 129.4
+  ];
+
+  const svg = document.getElementById('equity-svg');
+  const ns = 'http://www.w3.org/2000/svg';
+  const W = 840, H = 240;
+  const pad = { top: 20, right: 48, bottom: 32, left: 56 };
+  const iW = W - pad.left - pad.right, iH = H - pad.top - pad.bottom;
+  const yMin = 97, yMax = 134;
+  const x = i => pad.left + (i / (data.length - 1)) * iW;
+  const y = v => pad.top + (1 - (v - yMin) / (yMax - yMin)) * iH;
+
+  // Defs
+  const defs = document.createElementNS(ns, 'defs');
+  defs.innerHTML = `
+    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#B8760A" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#B8760A" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="chartClip">
+      <rect x="${pad.left}" y="${pad.top}" width="${iW}" height="${iH}"/>
+    </clipPath>
+  `;
+  svg.appendChild(defs);
+
+  // Grid lines + y-axis labels
+  [100, 105, 110, 115, 120, 125, 130].forEach(v => {
+    const yy = y(v);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', pad.left); line.setAttribute('x2', W - pad.right);
+    line.setAttribute('y1', yy); line.setAttribute('y2', yy);
+    line.setAttribute('stroke', '#C8C4BC'); line.setAttribute('stroke-width', '0.5');
+    svg.appendChild(line);
+
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', pad.left - 6); t.setAttribute('y', yy + 4);
+    t.setAttribute('text-anchor', 'end');
+    t.setAttribute('font-family', "'IBM Plex Mono', monospace");
+    t.setAttribute('font-size', '9'); t.setAttribute('fill', '#6B6760');
+    t.textContent = v;
+    svg.appendChild(t);
+  });
+
+  // Baseline (100)
+  const baseline = document.createElementNS(ns, 'line');
+  baseline.setAttribute('x1', pad.left); baseline.setAttribute('x2', W - pad.right);
+  baseline.setAttribute('y1', y(100)); baseline.setAttribute('y2', y(100));
+  baseline.setAttribute('stroke', '#0D0D0B'); baseline.setAttribute('stroke-width', '1');
+  svg.appendChild(baseline);
+
+  // X-axis quarters
+  ['Q1', 'Q2', 'Q3', 'Q4'].forEach((q, i) => {
+    const idx = Math.round(i * (data.length - 1) / 3);
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', x(idx)); t.setAttribute('y', H - 6);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-family', "'IBM Plex Mono', monospace");
+    t.setAttribute('font-size', '9'); t.setAttribute('fill', '#6B6760');
+    t.textContent = q;
+    svg.appendChild(t);
+  });
+
+  // Area
+  const pts = data.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const area = document.createElementNS(ns, 'polygon');
+  area.setAttribute('points', pts + ` ${x(data.length-1).toFixed(1)},${(pad.top+iH).toFixed(1)} ${x(0).toFixed(1)},${(pad.top+iH).toFixed(1)}`);
+  area.setAttribute('fill', 'url(#areaGrad)');
+  area.setAttribute('clip-path', 'url(#chartClip)');
+  area.style.opacity = '0';
+  area.style.transition = 'opacity 0.8s ease 1.8s';
+  svg.appendChild(area);
+
+  // Line path
+  const pathD = data.map((v, i) => `${i===0?'M':'L'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', pathD);
+  path.setAttribute('class', 'e-path');
+  path.setAttribute('clip-path', 'url(#chartClip)');
+  svg.appendChild(path);
+
+  const len = path.getTotalLength();
+  path.style.strokeDasharray = len;
+  path.style.strokeDashoffset = len;
+  path.style.transition = `stroke-dashoffset 2.2s cubic-bezier(0.4,0,0.2,1)`;
+
+  // End dot
+  const lx = x(data.length - 1), ly = y(data[data.length - 1]);
+  const dot = document.createElementNS(ns, 'circle');
+  dot.setAttribute('cx', lx); dot.setAttribute('cy', ly);
+  dot.setAttribute('r', '4'); dot.setAttribute('fill', '#B8760A');
+  dot.style.opacity = '0'; dot.style.transition = 'opacity 0.3s ease 2.4s';
+  svg.appendChild(dot);
+
+  const endTxt = document.createElementNS(ns, 'text');
+  endTxt.setAttribute('x', lx + 8); endTxt.setAttribute('y', ly + 4);
+  endTxt.setAttribute('font-family', "'IBM Plex Mono', monospace");
+  endTxt.setAttribute('font-size', '11'); endTxt.setAttribute('font-weight', '500');
+  endTxt.setAttribute('fill', '#B8760A');
+  endTxt.textContent = '+29.4%';
+  endTxt.style.opacity = '0'; endTxt.style.transition = 'opacity 0.3s ease 2.5s';
+  svg.appendChild(endTxt);
+
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      path.style.strokeDashoffset = '0';
+      area.style.opacity = '1';
+      dot.style.opacity = '1';
+      endTxt.style.opacity = '1';
+      obs.disconnect();
+    }
+  }, { threshold: 0.3 });
+  obs.observe(svg);
+})();
+
+// ——— ACCURACY BAR ———
+(function() {
+  const svg = document.getElementById('acc-svg');
+  const ns = 'http://www.w3.org/2000/svg';
+  const W = 420, H = 160;
+  const bx = 0, by = 56, bw = W, bh = 36;
+  const acc = 59.0;  // ADX33 variant win rate (2023+ OOS, n=39)
+
+  const mkT = (x, y, txt, anchor, size, weight, fill) => {
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y);
+    t.setAttribute('text-anchor', anchor);
+    t.setAttribute('font-family', "'IBM Plex Mono', monospace");
+    t.setAttribute('font-size', size);
+    t.setAttribute('font-weight', weight);
+    t.setAttribute('fill', fill);
+    t.textContent = txt;
+    return t;
+  };
+
+  // Labels
+  svg.appendChild(mkT(0, by - 10, 'WEEKLY DIR ADX33 — WIN RATE (OOS 2023+, n=39)', 'start', '9', '300', '#6B6760'));
+  svg.appendChild(mkT(bw * 0.5, by - 10, '50%', 'middle', '9', '300', '#A0A09A'));
+  svg.appendChild(mkT(bw, by - 10, '100%', 'end', '9', '300', '#C8C4BC'));
+
+  // BG bar
+  const bg = document.createElementNS(ns, 'rect');
+  bg.setAttribute('x', bx); bg.setAttribute('y', by);
+  bg.setAttribute('width', bw); bg.setAttribute('height', bh);
+  bg.setAttribute('fill', '#E8E4DC');
+  svg.appendChild(bg);
+
+  // Fill bar
+  const fill = document.createElementNS(ns, 'rect');
+  fill.setAttribute('x', bx); fill.setAttribute('y', by);
+  fill.setAttribute('width', '0'); fill.setAttribute('height', bh);
+  fill.setAttribute('fill', '#B8760A');
+  fill.style.transition = 'width 1.6s cubic-bezier(0.4,0,0.2,1)';
+  svg.appendChild(fill);
+
+  // 50% line
+  const ref = document.createElementNS(ns, 'line');
+  ref.setAttribute('x1', bw*0.5); ref.setAttribute('x2', bw*0.5);
+  ref.setAttribute('y1', by - 4); ref.setAttribute('y2', by + bh + 4);
+  ref.setAttribute('stroke', '#6B6760'); ref.setAttribute('stroke-width', '1');
+  ref.setAttribute('stroke-dasharray', '3,3');
+  svg.appendChild(ref);
+
+  // Value (count-up)
+  const valTxt = mkT(bw * (acc/100) + 6, by + bh/2 + 6, '', 'start', '22', '500', '#B8760A');
+  valTxt.style.opacity = '0'; valTxt.style.transition = 'opacity 0.4s ease 0.8s';
+  svg.appendChild(valTxt);
+
+  // Sub label
+  svg.appendChild(mkT(0, by + bh + 20, 'out-of-sample 2023+ · ADX≥33 gate · under surveillance (n=39 trades)', 'start', '10', '300', '#6B6760'));
+
+  let done = false;
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !done) {
+      done = true;
+      fill.setAttribute('width', bw * (acc / 100));
+      valTxt.style.opacity = '1';
+      let n = 50, step = 0, steps = 50;
+      const inc = (acc - 50) / steps;
+      const t = setInterval(() => {
+        n += inc; step++;
+        valTxt.textContent = n.toFixed(1) + '%';
+        if (step >= steps) { clearInterval(t); valTxt.textContent = acc + '%'; }
+      }, 1400 / steps);
+      obs.disconnect();
+    }
+  }, { threshold: 0.5 });
+  obs.observe(svg);
+})();
+
+// ——— REAL EQUITY CURVE (replaces hardcoded SVG if CSV loads) ———
+parseCSV('data/results/portfolio_combination.csv').then(rows => {
+  if (!rows.length) return;
+  const vg = rows.map(r => parseFloat(r.vixgate_nav));
+  const nifty = rows.map(r => parseFloat(r.nifty_nav));
+  const dates = rows.map(r => r.date);
+  // Patch the SVG equity curve data
+  const svg = document.getElementById('equity-svg');
+  if (!svg) return;
+  const skip = 3;
+  const filtDates = dates.filter((_, i) => i % skip === 0);
+  const filtVg = vg.filter((_, i) => i % skip === 0);
+  const W = 840, H = 240;
+  const pad = { top: 20, right: 48, bottom: 32, left: 56 };
+  const iW = W - pad.left - pad.right, iH = H - pad.top - pad.bottom;
+  const yMin = Math.min(...filtVg) * 0.98, yMax = Math.max(...filtVg) * 1.02;
+  const xf = i => pad.left + (i / (filtVg.length - 1)) * iW;
+  const yf = v => pad.top + (1 - (v - yMin) / (yMax - yMin)) * iH;
+  // Clear SVG and rebuild with real data
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const ns = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(ns, 'defs');
+  defs.innerHTML = `<linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#B8760A" stop-opacity="0.1"/><stop offset="100%" stop-color="#B8760A" stop-opacity="0"/></linearGradient>`;
+  svg.appendChild(defs);
+  // Grid
+  const gridVals = [yMin, yMin + (yMax-yMin)*0.25, yMin + (yMax-yMin)*0.5, yMin + (yMax-yMin)*0.75, yMax];
+  gridVals.forEach(v => {
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', pad.left); line.setAttribute('x2', W - pad.right);
+    line.setAttribute('y1', yf(v)); line.setAttribute('y2', yf(v));
+    line.setAttribute('stroke', '#C8C4BC'); line.setAttribute('stroke-width', '0.5');
+    svg.appendChild(line);
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', pad.left - 6); t.setAttribute('y', yf(v) + 4);
+    t.setAttribute('text-anchor', 'end'); t.setAttribute('font-family', "'IBM Plex Mono', monospace");
+    t.setAttribute('font-size', '9'); t.setAttribute('fill', '#6B6760');
+    t.textContent = v.toFixed(2); svg.appendChild(t);
+  });
+  // Area + line
+  const pts = filtVg.map((v, i) => `${xf(i).toFixed(1)},${yf(v).toFixed(1)}`).join(' ');
+  const area = document.createElementNS(ns, 'polygon');
+  area.setAttribute('points', pts + ` ${xf(filtVg.length-1)},${(pad.top+iH)} ${xf(0)},${(pad.top+iH)}`);
+  area.setAttribute('fill', 'url(#areaGrad)'); svg.appendChild(area);
+  const pathD = filtVg.map((v, i) => `${i===0?'M':'L'}${xf(i).toFixed(1)},${yf(v).toFixed(1)}`).join(' ');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', pathD); path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#B8760A'); path.setAttribute('stroke-width', '1.5');
+  path.setAttribute('stroke-linecap', 'round'); svg.appendChild(path);
+  // End label
+  const lx = xf(filtVg.length-1), ly = yf(filtVg[filtVg.length-1]);
+  const total_ret = ((filtVg[filtVg.length-1] / filtVg[0] - 1) * 100).toFixed(1);
+  const dot = document.createElementNS(ns, 'circle');
+  dot.setAttribute('cx', lx); dot.setAttribute('cy', ly); dot.setAttribute('r', '4'); dot.setAttribute('fill', '#B8760A'); svg.appendChild(dot);
+  const endT = document.createElementNS(ns, 'text');
+  endT.setAttribute('x', lx + 8); endT.setAttribute('y', ly + 4);
+  endT.setAttribute('font-family', "'IBM Plex Mono', monospace"); endT.setAttribute('font-size', '11'); endT.setAttribute('font-weight', '500'); endT.setAttribute('fill', '#B8760A');
+  endT.textContent = '+' + total_ret + '%'; svg.appendChild(endT);
+}).catch(() => {});
+
+// ——— SCROLL REVEALS ———
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>

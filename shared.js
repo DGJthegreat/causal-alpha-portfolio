@@ -5,6 +5,7 @@ const NAV_PAGES = [
   { id: 'overview',   label: 'Overview',   href: 'index.html' },
   { id: 'backtest',   label: 'Backtest',   href: 'backtest.html' },
   { id: 'live',       label: 'Live',       href: 'live.html' },
+  { id: 'herd',       label: 'AI Herd',    href: 'herd.html' },
   { id: 'simulator',  label: 'Simulator',  href: 'simulator.html' },
   { id: 'research',   label: 'Research',   href: 'research.html' },
   { id: 'status',     label: 'Status',     href: 'status.html' },

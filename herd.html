@@ -8,55 +8,95 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="shared.js"></script>
 <style>
-/* Phase badges */
-.phase-early   { color: var(--green); background: var(--green-light); border: 1px solid #8BC98F; }
-.phase-building { color: #A0521A; background: #FBF0E6; border: 1px solid #E8A96A; }
-.phase-crowded { color: var(--red); background: var(--red-light); border: 1px solid #E57373; }
-.phase-cold    { color: var(--ink-muted); background: var(--module-bg); border: 1px solid var(--rule); }
 
-.phase-badge { font-family: var(--font-mono); font-size: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; display: inline-block; }
+/* ── Phase / signal badges ─────────────────────────────────────────────────── */
+.pbadge { font-family: var(--font-mono); font-size: 8px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; display: inline-block; white-space: nowrap; }
+.p-early        { color: #166534; background: #DCFCE7; border: 1px solid #86EFAC; }
+.p-building     { color: #92400E; background: #FEF3C7; border: 1px solid #FCD34D; }
+.p-crowded      { color: #991B1B; background: #FEE2E2; border: 1px solid #FCA5A5; }
+.p-cold         { color: var(--ink-muted); background: var(--module-bg); border: 1px solid var(--rule); }
+.p-bear_herd    { color: #fff; background: #B91C1C; border: 1px solid #991B1B; }
+.p-distribution { color: #fff; background: #7C3AED; border: 1px solid #6D28D9; }
 
-/* Herd score bar */
-.score-bar-wrap { width: 80px; height: 6px; background: var(--module-bg); border-radius: 2px; display: inline-block; vertical-align: middle; }
-.score-bar-fill { height: 100%; border-radius: 2px; background: var(--amber); transition: width 0.3s; }
+.ibadge { font-family: var(--font-mono); font-size: 8px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; white-space: nowrap; }
+.i-llm      { color: #92400E; background: #FEF3C7; border: 1px solid #F59E0B; }
+.i-social   { color: #1E40AF; background: #DBEAFE; border: 1px solid #93C5FD; }
+.i-combined { color: #fff;    background: #7C3AED; border: 1px solid #6D28D9; }
 
-/* Theory callout */
-.thesis-box { border: 1px solid var(--rule); padding: 24px 32px; margin: 32px 0; }
-.thesis-box h3 { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 12px; }
-.thesis-step { display: flex; gap: 16px; margin-bottom: 10px; align-items: flex-start; font-size: 13px; line-height: 1.6; }
-.thesis-step-num { font-family: var(--font-mono); font-size: 20px; font-weight: 500; color: var(--module-bg); flex-shrink: 0; width: 32px; }
-.thesis-step-body { color: var(--ink-muted); }
-.thesis-step-body strong { color: var(--ink); font-family: var(--font-mono); font-size: 11px; }
+/* ── Score bar ─────────────────────────────────────────────────────────────── */
+.sbar { display: inline-flex; align-items: center; gap: 8px; }
+.sbar-track { width: 64px; height: 5px; background: var(--module-bg); border-radius: 3px; flex-shrink: 0; }
+.sbar-fill  { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.sbar-long  { background: #16A34A; }
+.sbar-short { background: #DC2626; }
 
-/* Filter bar */
-.filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.filter-btn { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 12px; border: 1px solid var(--rule); background: var(--ground); cursor: pointer; color: var(--ink-muted); transition: all 0.12s; }
-.filter-btn:hover { border-color: var(--amber); color: var(--amber); }
-.filter-btn.active { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+/* ── Tier badge ────────────────────────────────────────────────────────────── */
+.tier-sm  { font-family: var(--font-mono); font-size: 8px; padding: 1px 5px; color: #065F46; background: #D1FAE5; border: 1px solid #6EE7B7; }
+.tier-mid { font-family: var(--font-mono); font-size: 8px; padding: 1px 5px; color: var(--ink-muted); background: transparent; border: 1px solid var(--rule); }
 
-/* Herd table */
-.herd-tbl { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; }
-.herd-tbl th { font-size: 9px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--rule); cursor: pointer; user-select: none; }
-.herd-tbl th:hover { color: var(--ink); }
-.herd-tbl td { padding: 12px 14px; border-bottom: 1px solid var(--module-bg); vertical-align: middle; }
-.herd-tbl tr:hover td { background: var(--module-bg); }
-.herd-tbl tr.phase-early-row td:first-child { border-left: 2px solid var(--green); }
-.herd-tbl tr.phase-crowded-row td:first-child { border-left: 2px solid var(--red); }
+/* ── Filter chips ──────────────────────────────────────────────────────────── */
+.chips { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.chip { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 11px; border: 1px solid var(--rule); background: var(--ground); cursor: pointer; color: var(--ink-muted); transition: all 0.1s; }
+.chip:hover   { border-color: var(--ink); color: var(--ink); }
+.chip.on      { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+.chip.on-red  { background: #B91C1C; color: #fff; border-color: #991B1B; }
 
-/* Stat pills */
-.stat-pill { display: inline-flex; gap: 4px; font-family: var(--font-mono); font-size: 10px; }
-.sp-lbl { color: var(--ink-muted); }
-.sp-val { font-weight: 500; }
+/* ── Long table ────────────────────────────────────────────────────────────── */
+.htbl { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; }
+.htbl th { font-size: 9px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--rule); }
+.htbl td { padding: 10px 12px; border-bottom: 1px solid var(--module-bg); vertical-align: middle; }
+.htbl tr:hover td { background: var(--module-bg); }
+.htbl tr.r-early        td:first-child { border-left: 2px solid #22C55E; }
+.htbl tr.r-crowded      td:first-child { border-left: 2px solid #EF4444; }
+.htbl tr.r-bear_herd    td:first-child { border-left: 2px solid #B91C1C; }
+.htbl tr.r-distribution td:first-child { border-left: 2px solid #7C3AED; }
 
-/* Backtest callout */
-.backtest-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
-.bs-cell { background: var(--ground); padding: 20px 24px; }
-.bs-label { font-family: var(--font-mono); font-size: 9px; font-weight: 300; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); display: block; margin-bottom: 6px; }
-.bs-val { font-family: var(--font-mono); font-size: 32px; font-weight: 500; letter-spacing: -0.02em; display: block; }
-.bs-sub { font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); margin-top: 4px; }
+/* ── Short signal cards ────────────────────────────────────────────────────── */
+.short-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.short-card { border: 1px solid #FECACA; background: #FFF5F5; padding: 20px 22px; position: relative; overflow: hidden; }
+.short-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #DC2626; }
+.short-card.dist-card { border-color: #DDD6FE; background: #F5F3FF; }
+.short-card.dist-card::before { background: #7C3AED; }
+.sc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.sc-ticker { font-family: var(--font-mono); font-size: 18px; font-weight: 500; letter-spacing: -0.02em; }
+.sc-sector { font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); margin-top: 1px; }
+.sc-score-block { text-align: right; }
+.sc-score-num { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: #DC2626; letter-spacing: -0.03em; }
+.sc-score-lbl { font-family: var(--font-mono); font-size: 8px; color: #9CA3AF; letter-spacing: 0.1em; text-transform: uppercase; display: block; }
+.dist-card .sc-score-num { color: #7C3AED; }
+.sc-thesis { font-size: 12px; color: #6B7280; line-height: 1.55; margin: 10px 0; font-style: italic; }
+.sc-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.sc-stat { font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); }
+.sc-stat span { color: var(--ink); font-weight: 500; }
+.no-shorts { font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); padding: 32px 0; text-align: center; }
+
+/* ── Section header ────────────────────────────────────────────────────────── */
+.sec-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.sec-lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); }
+.sec-tag { font-family: var(--font-mono); font-size: 9px; padding: 2px 8px; }
+.tag-buy   { color: #166534; background: #DCFCE7; border: 1px solid #86EFAC; }
+.tag-short { color: #fff; background: #B91C1C; border: 1px solid #991B1B; }
+
+/* ── Backtest strip ────────────────────────────────────────────────────────── */
+.bstrip { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.bs-cell  { background: var(--ground); padding: 18px 22px; }
+.bs-lbl   { font-family: var(--font-mono); font-size: 9px; font-weight: 300; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); display: block; margin-bottom: 5px; }
+.bs-val   { font-family: var(--font-mono); font-size: 30px; font-weight: 500; letter-spacing: -0.02em; display: block; }
+.bs-sub   { font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); margin-top: 3px; }
+
+/* ── Theory box ────────────────────────────────────────────────────────────── */
+.theory { border: 1px solid var(--rule); padding: 20px 28px; margin: 24px 0; }
+.theory h3 { font-family: var(--font-mono); font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 12px; }
+.tstep { display: flex; gap: 14px; margin-bottom: 9px; font-size: 13px; line-height: 1.6; }
+.tstep-n { font-family: var(--font-mono); font-size: 18px; font-weight: 500; color: var(--module-bg); flex-shrink: 0; width: 28px; }
+.tstep-b { color: var(--ink-muted); }
+.tstep-b strong { color: var(--ink); font-family: var(--font-mono); font-size: 11px; }
+
+/* ── Social=0 note ─────────────────────────────────────────────────────────── */
+.zero-social-note { font-family: var(--font-mono); font-size: 9px; color: #166534; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 3px 8px; display: inline-block; }
+
 </style>
 </head>
 <body>
@@ -66,180 +106,239 @@
   <div class="page-title">AI <em>Herd</em> Scanner</div>
 </div>
 
-<!-- Theory section -->
+<!-- Theory -->
 <section class="section-sm">
   <div class="container">
     <p class="section-label">The Edge</p>
-    <div class="thesis-box">
+    <div class="theory">
       <h3>AI Herding Mechanism</h3>
-      <div class="thesis-step"><div class="thesis-step-num">01</div><div class="thesis-step-body"><strong>LLM Consensus</strong> — ChatGPT, Gemini, and Claude are trained on similar data → produce correlated recommendations. The signal exists before retail acts.</div></div>
-      <div class="thesis-step"><div class="thesis-step-num">02</div><div class="thesis-step-body"><strong>Community Amplification</strong> — Reddit, Telegram, YouTube creators use AI tools → recommendations spread to retail. This is the momentum engine.</div></div>
-      <div class="thesis-step"><div class="thesis-step-num">03</div><div class="thesis-step-body"><strong>Early Entry</strong> — Buy when <strong>LLMs agree but community hasn't caught on</strong> (EARLY phase). Exit when community saturated. Evidence: MTAR +50%, BHEL +40%.</div></div>
+      <div class="tstep"><div class="tstep-n">01</div><div class="tstep-b"><strong>LLM Consensus</strong> — ChatGPT, Gemini, Claude trained on same corpus → correlated picks. Signal exists before retail acts.</div></div>
+      <div class="tstep"><div class="tstep-n">02</div><div class="tstep-b"><strong>Crowd Amplification</strong> — Reddit, Telegram, YouTube spread AI picks to retail. Social velocity = momentum engine.</div></div>
+      <div class="tstep"><div class="tstep-n">03</div><div class="tstep-b"><strong>Entry/Exit</strong> — Buy EARLY/IGNITION (LLMs agree, social silent). Exit at CROWDED. Short BEAR HERD + DISTRIBUTION (crowd exiting).</div></div>
     </div>
   </div>
 </section>
 
-<!-- Backtest validation strip -->
+<!-- Backtest strip -->
 <section class="section-sm">
   <div class="container">
-    <p class="section-label">Proxy Backtest Validation — News Spike + Sentiment Signal (2021-2026)</p>
-    <div class="backtest-strip reveal">
-      <div class="bs-cell">
-        <span class="bs-label">OOS Sharpe</span>
-        <span class="bs-val amber">2.68</span>
-        <span class="bs-sub">2025-2026 out-of-sample</span>
-      </div>
-      <div class="bs-cell">
-        <span class="bs-label">Hit Rate</span>
-        <span class="bs-val green">61.5%</span>
-        <span class="bs-sub">5-day forward return</span>
-      </div>
-      <div class="bs-cell">
-        <span class="bs-label">IT Sector Sharpe</span>
-        <span class="bs-val amber">6.93</span>
-        <span class="bs-sub">20-day hold, OOS</span>
-      </div>
-      <div class="bs-cell">
-        <span class="bs-label">Mean Alpha</span>
-        <span class="bs-val green">+0.24%</span>
-        <span class="bs-sub">per 5-day trade vs sector</span>
-      </div>
+    <p class="section-label">Proxy Backtest — News Spike + Sentiment Signal (2021–2026)</p>
+    <div class="bstrip reveal">
+      <div class="bs-cell"><span class="bs-lbl">OOS Sharpe</span><span class="bs-val amber">2.68</span><span class="bs-sub">2025-2026</span></div>
+      <div class="bs-cell"><span class="bs-lbl">Hit Rate</span><span class="bs-val green">61.5%</span><span class="bs-sub">5-day hold</span></div>
+      <div class="bs-cell"><span class="bs-lbl">IT Sector Sharpe</span><span class="bs-val amber">6.93</span><span class="bs-sub">20-day OOS</span></div>
+      <div class="bs-cell"><span class="bs-lbl">Mean Alpha</span><span class="bs-val green">+0.24%</span><span class="bs-sub">per 5-day trade</span></div>
     </div>
-    <p style="font-family:var(--font-mono);font-size:10px;color:var(--ink-muted);margin-top:12px;">
-      Proxy signal = news_count_norm &gt; 75th pct AND weighted_sentiment &gt; 0 AND sentiment_change &gt; 0.
-      Academic basis: Lopez-Lira &amp; Tang (UCLA) 0.4-0.8% excess monthly return from LLM sentiment.
-    </p>
   </div>
 </section>
 
-<!-- Current herd picks -->
+<!-- Signal section -->
 <section class="section-sm">
   <div class="container">
-    <p class="section-label" id="signal-date-lbl">AI Herd Signal — Loading…</p>
+    <p class="section-label" id="date-lbl">AI Herd Signal — Loading…</p>
 
-    <div class="filter-bar">
-      <button class="filter-btn active" data-phase="ALL">All phases</button>
-      <button class="filter-btn" data-phase="EARLY">Early only</button>
-      <button class="filter-btn" data-phase="BUILDING">Building</button>
-      <button class="filter-btn" data-phase="CROWDED">Crowded</button>
+    <!-- LONG signals -->
+    <div style="margin-bottom: 36px;">
+      <div class="sec-row">
+        <span class="sec-lbl">Long signals</span>
+        <span class="sec-tag tag-buy">BUY / HOLD</span>
+      </div>
+      <div class="chips" id="long-chips">
+        <button class="chip on" data-f="ALL">All</button>
+        <button class="chip"    data-f="EARLY">Early</button>
+        <button class="chip"    data-f="BUILDING">Building</button>
+        <button class="chip"    data-f="CROWDED">Crowded</button>
+        <button class="chip"    data-f="IGNITION">⚡ Ignition</button>
+        <button class="chip"    data-f="SMALL">Small-cap</button>
+      </div>
+      <div class="table-wrap reveal">
+        <table class="htbl">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Phase</th>
+              <th>Score</th>
+              <th>LLM</th>
+              <th>Social</th>
+              <th>Velocity</th>
+              <th>Lead Gap</th>
+            </tr>
+          </thead>
+          <tbody id="long-tbody">
+            <tr><td colspan="7" style="padding:24px;color:var(--ink-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="table-wrap reveal">
-      <table class="herd-tbl" id="herd-table">
-        <thead>
-          <tr>
-            <th>Ticker</th>
-            <th>Phase</th>
-            <th>Herd Score</th>
-            <th>LLM Consensus</th>
-            <th>Social Intensity</th>
-            <th>Social Velocity</th>
-            <th>Lead Gap</th>
-            <th>Models</th>
-          </tr>
-        </thead>
-        <tbody id="herd-tbody">
-          <tr><td colspan="8" style="color:var(--ink-muted);padding:24px;font-size:11px;">Loading AI herd signal data…</td></tr>
-        </tbody>
-      </table>
+    <!-- SHORT signals -->
+    <div>
+      <div class="sec-row">
+        <span class="sec-lbl">Short signals</span>
+        <span class="sec-tag tag-short">AVOID / SHORT</span>
+      </div>
+      <div class="chips" id="short-chips">
+        <button class="chip on-red" data-f="ALL">All</button>
+        <button class="chip"        data-f="BEAR_HERD">Bear Herd</button>
+        <button class="chip"        data-f="DISTRIBUTION">Distribution</button>
+      </div>
+      <div id="short-grid" class="short-grid reveal">
+        <p class="no-shorts">Loading…</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Shadow mode notice -->
+<!-- Shadow notice -->
 <section class="section-sm">
   <div class="container">
     <div class="callout warn">
       <strong>Shadow Mode — Not Trading Yet</strong>
-      <p>This scanner is in observation mode. ai_herd_score is logged daily but does NOT influence the paper trader or any capital allocation. Promote to live trading gate only after: mean 10-day alpha &gt; 2% vs sector AND hit rate &gt; 54% over 2-4 weeks.</p>
+      <p>Signals are logged daily but do NOT influence the paper trader. Promote to live gate after: mean 10-day alpha &gt; 2% vs sector AND hit rate &gt; 54% over 2-4 weeks.</p>
     </div>
   </div>
 </section>
 
 <script>
 let allRows = [];
-let activePhase = 'ALL';
+let longFilter  = 'ALL';
+let shortFilter = 'ALL';
 
-// Try to load ai_herd_daily.csv
 parseCSV('data/live/ai_herd_daily.csv').then(rows => {
-  if (!rows || rows.length === 0) {
-    showNoData();
-    return;
-  }
-
-  // Get latest date
-  const dates = [...new Set(rows.map(r => r.date))].sort();
-  const latest = dates[dates.length - 1];
-  document.getElementById('signal-date-lbl').textContent =
-    `AI Herd Signal — ${latest}  (shadow mode)`;
-
-  // Filter to latest date
+  if (!rows || !rows.length) { noData(); return; }
+  const latest = [...new Set(rows.map(r => r.date))].sort().pop();
+  document.getElementById('date-lbl').textContent = `AI Herd Signal — ${latest}  (shadow mode)`;
   allRows = rows.filter(r => r.date === latest);
-  renderTable(allRows);
-}).catch(showNoData);
+  renderLong();
+  renderShort();
+}).catch(noData);
 
-function renderTable(rows) {
-  const filtered = activePhase === 'ALL'
-    ? rows
-    : rows.filter(r => r.phase === activePhase);
+// ── LONG ──────────────────────────────────────────────────────────────────────
+function renderLong() {
+  let rows = allRows.filter(r => (r.direction || 'LONG') !== 'SHORT');
 
-  // Sort by ai_herd_score desc
-  filtered.sort((a, b) => parseFloat(b.ai_herd_score||0) - parseFloat(a.ai_herd_score||0));
+  if      (longFilter === 'IGNITION') rows = rows.filter(r => String(r.signal_type).includes('IGNITION'));
+  else if (longFilter === 'SMALL')    rows = rows.filter(r => r.cap_tier === 'SMALL');
+  else if (longFilter !== 'ALL')      rows = rows.filter(r => r.phase === longFilter);
 
-  if (filtered.length === 0) {
-    document.getElementById('herd-tbody').innerHTML =
-      `<tr><td colspan="8" style="color:var(--ink-muted);padding:16px;">No ${activePhase} signals today.</td></tr>`;
+  rows.sort((a,b) => +b.ai_herd_score - +a.ai_herd_score);
+
+  const tbody = document.getElementById('long-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:16px;color:var(--ink-muted);">No signals for this filter.</td></tr>`;
     return;
   }
 
-  document.getElementById('herd-tbody').innerHTML = filtered.map(r => {
-    const phase    = (r.phase || 'COLD').toUpperCase();
-    const score    = parseFloat(r.ai_herd_score || 0);
-    const llm      = parseFloat(r.llm_consensus || 0);
-    const social   = parseFloat(r.social_intensity || 0);
-    const vel      = parseFloat(r.social_velocity || 0);
-    const gap      = parseFloat(r.lead_gap || 0);
-    const models   = parseInt(r.n_models || 0);
+  tbody.innerHTML = rows.map(r => {
+    const phase   = (r.phase || 'COLD').toLowerCase();
+    const sigType = (r.signal_type || '').toUpperCase();
+    const score   = +r.ai_herd_score || 0;
+    const llm     = +r.llm_consensus || 0;
+    const social  = +r.social_intensity || 0;
+    const vel     = +r.social_velocity || 0;
+    const gap     = +r.lead_gap || 0;
+    const tier    = (r.cap_tier || 'MID').toUpperCase();
 
-    const phaseCls = `phase-${phase.toLowerCase()}`;
-    const rowCls   = phase === 'EARLY' ? 'phase-early-row'
-                   : phase === 'CROWDED' ? 'phase-crowded-row' : '';
-    const scorePct = Math.round(score * 100);
-    const velSign  = vel >= 0 ? '+' : '';
+    const pBadge = `<span class="pbadge p-${phase}">${phase.toUpperCase()}</span>`;
+    const iBadge = sigType.includes('COMBINED') ? `<span class="ibadge i-combined">⚡ ignition</span>`
+                 : sigType.includes('LLM')      ? `<span class="ibadge i-llm">⚡ debut</span>`
+                 : sigType.includes('SOCIAL')   ? `<span class="ibadge i-social">⚡ viral</span>`
+                 : '';
+    const tierBadge = tier === 'SMALL' ? `<span class="tier-sm">SMALL</span>` : `<span class="tier-mid">MID</span>`;
+    const socialDisplay = social > 0
+      ? `${(social*100).toFixed(0)}%`
+      : `<span class="zero-social-note">0 — early</span>`;
 
-    return `<tr class="${rowCls}">
-      <td><strong>${r.ticker}</strong> <span style="color:var(--ink-muted);font-size:10px;">${r.sector||''}</span></td>
-      <td><span class="phase-badge ${phaseCls}">${phase}</span></td>
-      <td>
-        <span style="font-weight:500;">${score.toFixed(3)}</span>&nbsp;
-        <span class="score-bar-wrap"><span class="score-bar-fill" style="width:${scorePct}%"></span></span>
-      </td>
+    return `<tr class="r-${phase}">
+      <td><strong>${r.ticker}</strong>&nbsp;${tierBadge}&nbsp;${iBadge}</td>
+      <td>${pBadge}</td>
+      <td><span class="sbar"><strong>${score.toFixed(3)}</strong><span class="sbar-track"><span class="sbar-fill sbar-long" style="width:${Math.round(score*100)}%"></span></span></span></td>
       <td>${(llm*100).toFixed(0)}%</td>
-      <td>${(social*100).toFixed(0)}%</td>
-      <td style="color:${vel>=0?'var(--green)':'var(--red)'};">${velSign}${vel.toFixed(2)}</td>
-      <td style="color:${gap>=0?'var(--green)':'var(--red)'};">${gap>=0?'+':''}${gap.toFixed(2)}</td>
-      <td>${models}</td>
+      <td>${socialDisplay}</td>
+      <td style="color:${vel>=0?'#16A34A':'#DC2626'}">${vel>=0?'+':''}${vel.toFixed(2)}</td>
+      <td style="color:${gap>=0?'#16A34A':'#DC2626'}">${gap>=0?'+':''}${gap.toFixed(2)}</td>
     </tr>`;
   }).join('');
 }
 
-function showNoData() {
-  document.getElementById('signal-date-lbl').textContent = 'AI Herd Signal — no data yet';
-  document.getElementById('herd-tbody').innerHTML = `
-    <tr><td colspan="8" style="padding:32px;color:var(--ink-muted);">
-      <p style="font-family:var(--font-mono);font-size:12px;margin-bottom:8px;">No signal data found.</p>
-      <p style="font-size:11px;">Run <code>python3 -m ai_herd_scanner.scan</code> to generate today's signal.
-      <br>Data will appear at <code>data/signals/ai_herd_daily.csv</code>.</p>
-    </td></tr>`;
+// ── SHORT ─────────────────────────────────────────────────────────────────────
+function renderShort() {
+  let rows = allRows.filter(r => (r.direction || 'LONG') === 'SHORT');
+  if (shortFilter !== 'ALL') rows = rows.filter(r => r.phase === shortFilter);
+  rows.sort((a,b) => +b.short_score - +a.short_score);
+
+  const grid = document.getElementById('short-grid');
+  if (!rows.length) {
+    grid.innerHTML = `<p class="no-shorts">No short signals match this filter.</p>`;
+    return;
+  }
+
+  grid.innerHTML = rows.map(r => {
+    const phase    = (r.phase || 'COLD').toUpperCase();
+    const isDist   = phase === 'DISTRIBUTION';
+    const score    = +r.short_score || 0;
+    const cons     = +r.short_consensus || 0;
+    const social   = +r.social_intensity || 0;
+    const vel      = +r.social_velocity || 0;
+    const thesis   = (r.short_thesis || '').trim();
+    const pLabel   = isDist ? 'Distribution' : 'Bear Herd';
+    const pClass   = isDist ? 'p-distribution' : 'p-bear_herd';
+
+    const metaSocial = social > 0
+      ? `<span class="sc-stat">Social <span>${(social*100).toFixed(0)}%</span></span>`
+      : '';
+    const metaVel = vel !== 0
+      ? `<span class="sc-stat">Vel <span style="color:${vel>=0?'#16A34A':'#DC2626'}">${vel>=0?'+':''}${vel.toFixed(2)}</span></span>`
+      : '';
+    const metaCons = cons > 0
+      ? `<span class="sc-stat">Consensus <span>${(cons*100).toFixed(0)}%</span></span>`
+      : '';
+
+    return `<div class="short-card${isDist?' dist-card':''}">
+      <div class="sc-header">
+        <div>
+          <div class="sc-ticker">${r.ticker}</div>
+          <div class="sc-sector">${r.sector || ''}</div>
+        </div>
+        <div class="sc-score-block">
+          <span class="sc-score-num">${score.toFixed(2)}</span>
+          <span class="sc-score-lbl">short score</span>
+        </div>
+      </div>
+      <span class="pbadge ${pClass}">${pLabel.toUpperCase()}</span>
+      ${thesis ? `<p class="sc-thesis">"${thesis}"</p>` : ''}
+      <div class="sc-meta">
+        ${metaCons}${metaSocial}${metaVel}
+        <span class="sc-stat">Models <span>${r.n_models||0}</span></span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// Filter buttons
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activePhase = btn.dataset.phase;
-    renderTable(allRows);
+function noData() {
+  document.getElementById('date-lbl').textContent = 'AI Herd Signal — no data yet';
+  document.getElementById('long-tbody').innerHTML = `<tr><td colspan="7" style="padding:32px;color:var(--ink-muted);font-family:var(--font-mono);font-size:11px;">Run <code>python3 -m ai_herd_scanner.scan</code> to generate signals.</td></tr>`;
+  document.getElementById('short-grid').innerHTML = `<p class="no-shorts">No data.</p>`;
+}
+
+// ── chip handlers ─────────────────────────────────────────────────────────────
+document.getElementById('long-chips').querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.getElementById('long-chips').querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+    longFilter = c.dataset.f;
+    renderLong();
+  });
+});
+
+document.getElementById('short-chips').querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.getElementById('short-chips').querySelectorAll('.chip').forEach(x => {
+      x.classList.remove('on','on-red');
+    });
+    c.classList.add('on-red');
+    shortFilter = c.dataset.f;
+    renderShort();
   });
 });
 </script>

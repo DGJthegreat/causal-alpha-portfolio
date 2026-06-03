@@ -1,12 +1,12 @@
 {
   "started": "2026-05-30",
-  "last_run": "2026-06-01",
+  "last_run": "2026-06-03",
   "nav": {
-    "total": 98.10979087104425,
+    "total": 98.19376522665145,
     "options": 100.0,
-    "sector": 96.20523034524162,
+    "sector": 96.31573226472507,
     "straddle": 100.0,
-    "idle": 100.02870279369378
+    "idle": 100.14359637715567
   },
   "positions": {
     "options": {
@@ -19,8 +19,8 @@
       "exit_date_target": null
     },
     "sector": {
-      "active_sector": "cnxenergy",
-      "since": "2026-05-30",
+      "active_sector": null,
+      "since": "2026-06-03",
       "entry_sector_close": 40814.6015625
     },
     "straddle": {
@@ -56,6 +56,38 @@
       "sector": 96.2052,
       "straddle": 100.0,
       "idle": 100.0287
+    },
+    {
+      "date": "2026-06-03",
+      "total": 98.1308,
+      "options": 100.0,
+      "sector": 96.2328,
+      "straddle": 100.0,
+      "idle": 100.0574
+    },
+    {
+      "date": "2026-06-03",
+      "total": 98.1518,
+      "options": 100.0,
+      "sector": 96.2605,
+      "straddle": 100.0,
+      "idle": 100.0861
+    },
+    {
+      "date": "2026-06-03",
+      "total": 98.1728,
+      "options": 100.0,
+      "sector": 96.2881,
+      "straddle": 100.0,
+      "idle": 100.1149
+    },
+    {
+      "date": "2026-06-03",
+      "total": 98.1938,
+      "options": 100.0,
+      "sector": 96.3157,
+      "straddle": 100.0,
+      "idle": 100.1436
     }
   ],
   "signals_history": []

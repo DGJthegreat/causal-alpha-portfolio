@@ -1,0 +1,18 @@
+date,ticker,sector,n_models,llm_consensus,social_intensity,social_velocity,lead_gap,phase,ai_herd_score,data_complete,cap_tier,direction,signal_type,short_consensus,short_score,long_thesis,short_thesis
+2026-06-03,COCHINSHIP,OTHER,2,0.3518,0.0,0.0,0.3518,EARLY,0.5277,True,MID,LONG,LLM_IGNITION,0.0,0.0,Defence and shipbuilding pipeline remains strong with sustained order-book visibility. / Specialty pharma with high-margin injectables; USFDA approvals pipeline strong; biosimilar expansion in EU driving 15%+ CAGR.,
+2026-06-03,KAYNES,OTHER,1,0.276,0.0,0.0,0.276,EARLY,0.414,True,MID,LONG,LLM_IGNITION,0.0,0.0,"EMS manufacturing momentum, strong order book and earnings visibility with continued capex cycle tailwinds.",
+2026-06-03,ASTRAL,OTHER,1,0.2491,0.0,0.0,0.2491,COLD,0.3736,True,MID,LONG,LLM_IGNITION,0.0,0.0,Piping solutions leader; housing boom + infra spending; market share gains; 18-20% volume growth; premium valuations justified by execution.,
+2026-06-03,LTIM,OTHER,1,0.1773,0.0,0.0,0.1773,COLD,0.266,True,MID,LONG,LLM_IGNITION,0.0,0.0,Mid-cap IT services with 18%+ organic growth; undervalued vs TCS/Infosys; digital transformation demand robust across BFSI/discrete mfg.,
+2026-06-03,PERSISTENT,cnxit,1,0.1717,0.0,0.0,0.1717,COLD,0.2576,True,MID,LONG,LLM_IGNITION,0.0,0.0,Mid-cap IT leader with AI-led demand exposure and resilient revenue growth relative to peers.,
+2026-06-03,DIXON,OTHER,1,0.1667,0.0,0.0,0.1667,COLD,0.25,True,MID,LONG,LLM_IGNITION,0.0,0.0,,
+2026-06-03,COFORGE,cnxit,1,0.1667,0.0,0.0,0.1667,COLD,0.25,True,MID,LONG,LLM_IGNITION,0.0,0.0,,
+2026-06-03,MTAR,OTHER,1,0.1667,0.0,0.0,0.1667,COLD,0.25,True,MID,LONG,LLM_IGNITION,0.0,0.0,,
+2026-06-03,FINEORG,OTHER,1,0.1508,0.0,0.0,0.1508,COLD,0.2262,True,MID,LONG,LLM_IGNITION,0.0,0.0,Fine chemicals/APIs with pricing power; China+1 strategy driving customer diversification; EBITDA margins expanding above 25%.,
+2026-06-03,TANLA,OTHER,1,0.0633,0.0,0.0,0.0633,COLD,0.0633,True,MID,LONG,HERD,0.0,0.0,Enterprise messaging and telecom-platform business offers attractive risk-reward after prolonged consolidation.,
+2026-06-03,VGUARD,OTHER,1,0.0479,0.0,0.0,0.0479,COLD,0.0479,True,MID,LONG,HERD,0.0,0.0,Power distribution/cables play; rural electrification + solar capex driving revenue; 20%+ EBITDA growth runway; low institutional coverage.,
+2026-06-03,LAURUSLABS,OTHER,1,0.1965,0.8176,0.1,-0.6211,CROWDED,0.0324,True,MID,NONE,LLM_IGNITION,0.0,0.0,"Pharma cycle recovery, improving margins and specialty product mix create positive earnings momentum.",
+2026-06-03,ALKEM,cnxpharma,1,0.1667,0.8176,0.05,-0.6509,CROWDED,0.0263,True,MID,NONE,LLM_IGNITION,0.0,0.0,,
+2026-06-03,RVNL,OTHER,1,0.0,0.0,0.0,0.0,BEAR_HERD,0.0,True,MID,SHORT,BEAR_HERD,0.3636,0.3636,,"Weak Q4 FY26 earnings with sharp profit decline, deteriorating operating performance and fading railway-PSU momentum."
+2026-06-03,ADANIGREEN,cnxenergy,1,0.0,0.0,0.0,0.0,BEAR_HERD,0.0,True,MID,SHORT,BEAR_HERD,0.2984,0.2984,,Premium valuation remains difficult to justify amid earnings pressure and lingering governance/regulatory concerns.
+2026-06-03,DABUR,cnxfmcg,1,0.0,0.0,0.0,0.0,BEAR_HERD,0.0,True,MID,SHORT,BEAR_HERD,0.25,0.25,,Rising systemic risk from adverse USFDA compliance issues at its Silvassa plant alongside sector-wide margins getting squeezed by spiking crude-linked packaging and distribution costs.
+2026-06-03,PAYTM,OTHER,1,0.0,0.8176,0.1,-0.8176,CROWDED,0.0,True,MID,NONE,HERD,0.1011,0.1011,,"Rich valuation versus profitability profile, slowing sentiment and continued execution/regulatory overhang."

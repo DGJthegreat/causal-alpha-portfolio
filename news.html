@@ -26,6 +26,24 @@
 <script>
 const MILESTONES = [
   {
+    date: '2026-06-03', type: 'MILESTONE', badge: 'active',
+    title: 'Bear-Side Builds Live — PUT Leg + IVIX Slope Gate + Nifty Regime Research',
+    summary: 'Three bear-exploitation builds completed. (A) PUT weekly leg enabled: bear_score≥5 → ATM PUT trade, VIX<25 guard. (B) Nifty20 regime gate backtested: MaxDD −25.9%→−25.3%, CAGR unchanged. (C) IVIX slope 8th straddle gate: +15.1pp backwardation today.',
+    body: `<p>Full bear-side research pipeline completed (6-phase deep research, 18 sources). Three builds shipped to production.</p>
+    <h4>Build A — PUT Weekly Leg</h4>
+    <p>Symmetric counterpart to the existing CALL leg. <code>bear_score ≥ 5 AND bear_score > bull_score AND VIX &lt; 25</code> → enter ATM PUT Monday, exit Tuesday. Today: bear=6/7 (strong bear signal). ADX=32.3 just below gate — no trade today, but directional puts will fire on the next qualifying Monday.</p>
+    <h4>Build B — Nifty20 Regime Gate (Backtest)</h4>
+    <table><thead><tr><th>Config</th><th>CAGR</th><th>Sharpe</th><th>MaxDD</th><th>₹10L→</th></tr></thead>
+    <tbody>
+      <tr><td>ADX+MOM20 (current)</td><td>+21.6%</td><td>1.18</td><td>−25.9%</td><td>₹82L</td></tr>
+      <tr><td><strong>ADX+MOM20 + Nifty gate</strong></td><td><strong>+21.4%</strong></td><td><strong>1.18</strong></td><td><strong>−25.3%</strong></td><td><strong>₹81L</strong></td></tr>
+    </tbody></table>
+    <p>Halving Nifty exposure 20%→10% during gate-off days: −0.2pp CAGR cost, −0.6pp MaxDD improvement. Marginal benefit at current 20% Nifty weight — deferred for live implementation.</p>
+    <h4>Build C — IVIX Slope 8th Straddle Gate</h4>
+    <p>Proxy for VIX term structure backwardation (Johnson 2017, JFQA). Gate passes when VIX &gt; short-term RV AND short-term RV not accelerating past long-term RV. Current: ivix_slope = +15.1pp (PASS). Total straddle gates now: 8 (vix, fii, vrp, ivix_slope, atr, rate, mom_bleed, calendar).</p>
+    <p><strong>Research verdict:</strong> India TC stack 10× US makes pairs/SSF short-selling unviable at monthly frequency. Directional PUT spreads + regime gates are the correct bear exploitation path for this system.</p>`
+  },
+  {
     date: '2026-06-02', type: 'RESEARCH', badge: 'active',
     title: 'Max-Alpha Config Found — 30% MaxDD Budget',
     summary: '648-config grid search under 30% MaxDD constraint. Optimal: 3× sector leverage, 40% VG, 15% Nifty, 12% opt/trade, 10% straddle → CAGR +22.3%, Sharpe 1.20, MaxDD −27.2%, ₹10L → ₹88L.',

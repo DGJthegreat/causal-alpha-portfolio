@@ -1,0 +1,82 @@
+{
+ "strategy_name": "VIX_GATE (original headline rule)",
+ "benchmark_name": "Buy and hold, same sectors",
+ "sectors": [
+  "Nifty Auto",
+  "Nifty Metal",
+  "Nifty Realty"
+ ],
+ "basis": "Pre-registered test on NSE sectors the rules never saw (Auto, Metal, Realty), after NSE trading costs",
+ "period": {
+  "start": "2021-01-01",
+  "end": "2026-07-17"
+ },
+ "strategy": {
+  "sharpe": 0.13,
+  "maxdd": -12.3,
+  "exposure": 35
+ },
+ "bh": {
+  "sharpe": 0.91,
+  "maxdd": -26.7,
+  "exposure": 100
+ },
+ "matched_mix": {
+  "exposure": 35,
+  "maxdd": -8.2
+ },
+ "approaches": [
+  {
+   "key": "vix_gate",
+   "label": "VIX_GATE (original headline rule)",
+   "sharpe": 0.13,
+   "maxdd": -12.3,
+   "exposure": 35
+  },
+  {
+   "key": "mom20",
+   "label": "20-day momentum",
+   "sharpe": 0.7,
+   "maxdd": -20.2,
+   "exposure": 61
+  },
+  {
+   "key": "adx_mom20",
+   "label": "ADX + momentum",
+   "sharpe": 0.64,
+   "maxdd": -8.4,
+   "exposure": 20
+  },
+  {
+   "key": "gtrxl_ppo",
+   "label": "Transformer RL (GTrXL)",
+   "sharpe": 0.67,
+   "maxdd": -18.3,
+   "exposure": 48
+  },
+  {
+   "key": "mlp_ppo",
+   "label": "RL (MLP)",
+   "sharpe": 0.77,
+   "maxdd": -18.1,
+   "exposure": 55
+  },
+  {
+   "key": "pcmci_causal",
+   "label": "Causal-discovery filter (PCMCI)",
+   "sharpe": -0.39,
+   "maxdd": -12.8,
+   "exposure": 17
+  }
+ ],
+ "spa_p": 1.0,
+ "dsr": 0.0,
+ "dsr_trials": 2544,
+ "drawdown_test_p": 0.64,
+ "pbo": 0.59,
+ "edge": false,
+ "pcmci_links_robust": 0,
+ "pcmci_links_parcorr": 12,
+ "source": "causal-alpha-paper/paper/public_facts.json",
+ "generated": "2026-10-29"
+}

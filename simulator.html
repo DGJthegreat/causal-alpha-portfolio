@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulator — CausalAlpha</title>
+<title>Simulator: CausalAlpha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -11,8 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="shared.js"></script>
 <style>
-.sim-layout { display: grid; grid-template-columns: 380px 1fr; gap: 48px; align-items: start; }
-.sim-panel { position: sticky; top: 80px; }
+.sim-layout { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 48px; align-items: start; }
+.sim-panel { position: sticky; top: 80px; min-width: 0; }
 .sim-group { margin-bottom: 28px; border-top: 1px solid var(--rule); padding-top: 16px; }
 .sim-group h4 { font-family: var(--font-mono); font-size: 9px; font-weight: 300; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 14px; }
 .output-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 24px; }
@@ -29,7 +29,7 @@
 .sum-ok { background: var(--green-light); color: var(--green); border: 1px solid #8BC98F; }
 .sum-bad { background: var(--red-light); color: var(--red); border: 1px solid #E57373; }
 
-/* Slider + number input — two-way bound */
+/* Slider + number input: two-way bound */
 .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 .slider-row label { font-family: var(--font-mono); font-size: 10px; font-weight: 400; letter-spacing: 0.08em; color: var(--ink); width: 88px; flex-shrink: 0; }
 .slider-row input[type=range] { flex: 1; accent-color: var(--amber); min-width: 0; }
@@ -37,15 +37,16 @@
   font-family: var(--font-mono); font-size: 12px; font-weight: 500;
   width: 50px; flex-shrink: 0; text-align: right;
   border: 1px solid var(--rule); background: var(--ground); color: var(--ink);
-  padding: 4px 6px; outline: none;
+  padding: 4px 6px;
   -moz-appearance: textfield;
 }
 .slider-num:focus { border-color: var(--amber); }
+.slider-num:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .slider-num::-webkit-outer-spin-button,
 .slider-num::-webkit-inner-spin-button { -webkit-appearance: none; }
 .slider-unit { font-family: var(--font-mono); font-size: 10px; color: var(--ink-muted); width: 12px; flex-shrink: 0; }
 
-@media (max-width: 900px) { .sim-layout { grid-template-columns: 1fr; } .sim-panel { position: static; } }
+@media (max-width: 900px) { .sim-layout { grid-template-columns: minmax(0, 1fr); } .sim-panel { position: static; } .radio-row { flex-wrap: wrap; } }
 </style>
 </head>
 <body>
@@ -53,6 +54,11 @@
 
 <div class="container">
   <div class="page-title">Port<em>folio</em> Simulator</div>
+</div>
+<div class="container">
+  <div class="callout warn"><strong>Illustrative only, not validated</strong>
+    <p>This tool replays a legacy NAV file from May 2026, produced before the 20 Oct 2026 cost correction. Leverage here multiplies net returns and does not charge the extra trading costs leverage incurs, so leveraged results are overstated. The VIX_GATE series is itself a legacy 2x NAV, so the default 1× setting already replays 2x exposure and 2× here is effectively 4x. The corrected, unlevered result is on the Overview page.</p></div>
+  <div class="callout fail" id="sim-error" role="alert" hidden><strong>Simulator data unavailable</strong><p></p></div>
 </div>
 
 <section class="section-sm">
@@ -62,54 +68,54 @@
       <!-- Controls -->
       <div class="sim-panel">
         <div class="preset-btns">
-          <button class="preset-btn" onclick="applyPreset('target')">Current</button>
-          <button class="preset-btn" onclick="applyPreset('optimal')">Max-Sharpe (3×)</button>
+          <button class="preset-btn" onclick="applyPreset('target')">Default (1×)</button>
+          <button class="preset-btn" onclick="applyPreset('optimal')">Leveraged 3×</button>
           <button class="preset-btn" onclick="applyPreset('conservative')">Conservative</button>
-          <button class="preset-btn" onclick="applyPreset('aggressive')">Max-CAGR (2.5×)</button>
+          <button class="preset-btn" onclick="applyPreset('aggressive')">Leveraged 2.5×</button>
         </div>
 
         <div class="sim-group">
           <h4>Portfolio Allocation <span id="sum-indicator" class="sum-indicator sum-ok">= 100%</span></h4>
           <div class="slider-row">
-            <label>VIX_GATE</label>
+            <label for="sl-vg">VIX_GATE</label>
             <input type="range" id="sl-vg" min="0" max="100" value="50">
-            <input type="number" class="slider-num" id="ni-vg" min="0" max="100" value="50">
+            <input type="number" class="slider-num" id="ni-vg" aria-label="VIX_GATE allocation, percent" min="0" max="100" value="50">
             <span class="slider-unit">%</span>
           </div>
           <div class="slider-row">
-            <label>Options</label>
+            <label for="sl-opt">Options</label>
             <input type="range" id="sl-opt" min="0" max="100" value="20">
-            <input type="number" class="slider-num" id="ni-opt" min="0" max="100" value="20">
+            <input type="number" class="slider-num" id="ni-opt" aria-label="Options allocation, percent" min="0" max="100" value="20">
             <span class="slider-unit">%</span>
           </div>
           <div class="slider-row">
-            <label>Idle/Cash</label>
+            <label for="sl-idle">Idle/Cash</label>
             <input type="range" id="sl-idle" min="0" max="100" value="25">
-            <input type="number" class="slider-num" id="ni-idle" min="0" max="100" value="25">
+            <input type="number" class="slider-num" id="ni-idle" aria-label="Idle/Cash allocation, percent" min="0" max="100" value="25">
             <span class="slider-unit">%</span>
           </div>
           <div class="slider-row">
-            <label>CALLS</label>
+            <label for="sl-calls">CALLS</label>
             <input type="range" id="sl-calls" min="0" max="100" value="5">
-            <input type="number" class="slider-num" id="ni-calls" min="0" max="100" value="5">
+            <input type="number" class="slider-num" id="ni-calls" aria-label="CALLS allocation, percent" min="0" max="100" value="5">
             <span class="slider-unit">%</span>
           </div>
         </div>
 
         <div class="sim-group">
           <h4>Leverage</h4>
-          <div class="radio-row">
-            <label class="radio-label">VIX_GATE</label>
-            <button class="radio-btn" data-group="lev-vg" data-val="1">1×</button>
-            <button class="radio-btn" data-group="lev-vg" data-val="1.5">1.5×</button>
-            <button class="radio-btn selected" data-group="lev-vg" data-val="2">2×</button>
-            <button class="radio-btn" data-group="lev-vg" data-val="3">3×</button>
+          <div class="radio-row" role="group" aria-labelledby="lev-vg-label">
+            <span class="radio-label" id="lev-vg-label">VIX_GATE</span>
+            <button type="button" class="radio-btn selected" aria-pressed="true" data-group="lev-vg" data-val="1">1×</button>
+            <button type="button" class="radio-btn" aria-pressed="false" data-group="lev-vg" data-val="1.5">1.5×</button>
+            <button type="button" class="radio-btn" aria-pressed="false" data-group="lev-vg" data-val="2">2×</button>
+            <button type="button" class="radio-btn" aria-pressed="false" data-group="lev-vg" data-val="3">3×</button>
           </div>
-          <div class="radio-row">
-            <label class="radio-label">Options</label>
-            <button class="radio-btn selected" data-group="lev-opt" data-val="1">1×</button>
-            <button class="radio-btn" data-group="lev-opt" data-val="1.5">1.5×</button>
-            <button class="radio-btn" data-group="lev-opt" data-val="2">2×</button>
+          <div class="radio-row" role="group" aria-labelledby="lev-opt-label">
+            <span class="radio-label" id="lev-opt-label">Options</span>
+            <button type="button" class="radio-btn selected" aria-pressed="true" data-group="lev-opt" data-val="1">1×</button>
+            <button type="button" class="radio-btn" aria-pressed="false" data-group="lev-opt" data-val="1.5">1.5×</button>
+            <button type="button" class="radio-btn" aria-pressed="false" data-group="lev-opt" data-val="2">2×</button>
           </div>
         </div>
       </div>
@@ -117,14 +123,14 @@
       <!-- Output -->
       <div>
         <div class="output-metrics">
-          <div class="out-cell"><span class="out-label">CAGR</span><span class="out-value amber" id="out-cagr">—</span></div>
-          <div class="out-cell"><span class="out-label">Sharpe</span><span class="out-value" id="out-sharpe">—</span></div>
-          <div class="out-cell"><span class="out-label">Max Drawdown</span><span class="out-value" id="out-maxdd">—</span></div>
-          <div class="out-cell"><span class="out-label">Calmar</span><span class="out-value" id="out-calmar">—</span></div>
+          <div class="out-cell"><span class="out-label">CAGR</span><span class="out-value amber" id="out-cagr">n/a</span></div>
+          <div class="out-cell"><span class="out-label">Sharpe</span><span class="out-value" id="out-sharpe">n/a</span></div>
+          <div class="out-cell"><span class="out-label">Max Drawdown</span><span class="out-value" id="out-maxdd">n/a</span></div>
+          <div class="out-cell"><span class="out-label">Calmar</span><span class="out-value" id="out-calmar">n/a</span></div>
         </div>
         <div class="lift-banner">
           <span class="lift-label">vs Nifty50 benchmark</span>
-          <span class="lift-val" id="out-lift">—</span>
+          <span class="lift-val" id="out-lift">n/a</span>
         </div>
         <div class="chart-wrap" style="height:320px;"><canvas id="sim-chart"></canvas></div>
       </div>
@@ -134,7 +140,7 @@
 
 <script>
 const PRESETS = {
-  target:       { vg: 50, opt: 20, idle: 25, calls: 5,  levVg: 2,   levOpt: 1 },
+  target:       { vg: 50, opt: 20, idle: 25, calls: 5,  levVg: 1,   levOpt: 1 },
   optimal:      { vg: 40, opt: 15, idle: 33, calls: 12, levVg: 3,   levOpt: 1 },
   conservative: { vg: 30, opt: 10, idle: 60, calls: 0,  levVg: 1,   levOpt: 1 },
   aggressive:   { vg: 40, opt: 15, idle: 35, calls: 10, levVg: 2.5, levOpt: 1 },
@@ -142,26 +148,23 @@ const PRESETS = {
 
 let portData = null;
 let simChart = null;
-let levVg = 2, levOpt = 1;
+let levVg = 1, levOpt = 1;  // legacy VIX_GATE NAV is already 2x pre-fix: 1x here = 2x exposure
 
+// Legacy NAV file. straddle_nav duplicates nifty_nav (broken) and is not used.
 parseCSV('data/results/portfolio_combination.csv').then(rows => {
+  if (!rows.length) throw new Error('file is empty');
   portData = {
     dates: rows.map(r => r.date),
     vg:    rows.map(r => parseFloat(r.vixgate_nav)),
     opt:   rows.map(r => parseFloat(r.options_nav)),
-    strad: rows.map(r => parseFloat(r.straddle_nav)),
     nifty: rows.map(r => parseFloat(r.nifty_nav)),
   };
   recalc();
-}).catch(() => {
-  const n = 100;
-  const dates = Array.from({length: n}, (_, i) => {
-    const d = new Date('2022-01-03'); d.setDate(d.getDate() + i * 7);
-    return d.toISOString().slice(0, 10);
-  });
-  const synth = (s, v, dr) => { let x = s; return dates.map(() => { x *= (1 + dr + (Math.random() - 0.48) * v); return x; }); };
-  portData = { dates, vg: synth(1, 0.02, 0.002), opt: synth(1, 0.025, 0.003), strad: synth(1, 0.01, 0.001), nifty: synth(1, 0.018, 0.0015) };
-  recalc();
+}).catch(err => {
+  // No synthetic data: show the failure instead of invented numbers.
+  const box = document.getElementById('sim-error');
+  box.hidden = false;
+  box.querySelector('p').textContent = 'Could not load data/results/portfolio_combination.csv (' + (err && err.message || err) + '). The simulator has no data to run on.';
 });
 
 function getWeights() {
@@ -194,7 +197,7 @@ function recalc() {
   const niftyNav = normalizeTo1(portData.nifty);
   const years = calcYears(portData.dates);
   const cagr = calcCAGR(combNav, years);
-  const sharpe = calcSharpe(combRet);
+  const sharpe = calcSharpe(combRet, 252);  // daily NAV rows -> 252 trading days/yr
   const maxdd = calcMaxDD(combNav);
   const calmar = maxdd !== 0 ? -(cagr / maxdd) : 0;
   const lift = cagr - calcCAGR(niftyNav, years);
@@ -241,9 +244,8 @@ function recalc() {
 document.querySelectorAll('.radio-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const g = btn.dataset.group;
-    document.querySelectorAll('.radio-btn[data-group="' + g + '"]').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
     const val = parseFloat(btn.dataset.val);
+    syncLevButtons(g, val);
     if (g === 'lev-vg') levVg = val;
     if (g === 'lev-opt') levOpt = val;
     recalc();
@@ -257,11 +259,18 @@ function applyPreset(name) {
     document.getElementById('ni-' + k).value = p[k];
   });
   levVg = p.levVg; levOpt = p.levOpt;
-  document.querySelectorAll('.radio-btn[data-group="lev-vg"]').forEach(b =>
-    b.classList.toggle('selected', parseFloat(b.dataset.val) === levVg));
-  document.querySelectorAll('.radio-btn[data-group="lev-opt"]').forEach(b =>
-    b.classList.toggle('selected', parseFloat(b.dataset.val) === levOpt));
+  syncLevButtons('lev-vg', levVg);
+  syncLevButtons('lev-opt', levOpt);
   recalc();
+}
+
+// one place that keeps the visual state and aria-pressed in step
+function syncLevButtons(group, val) {
+  document.querySelectorAll('.radio-btn[data-group="' + group + '"]').forEach(b => {
+    const on = parseFloat(b.dataset.val) === val;
+    b.classList.toggle('selected', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
 }
 </script>
 </body>

@@ -1,12 +1,13 @@
 {
   "started": "2026-05-30",
-  "last_run": "2026-06-03",
+  "last_run": "2026-10-28",
   "nav": {
-    "total": 98.19376522665145,
-    "options": 100.0,
-    "sector": 96.31573226472507,
-    "straddle": 100.0,
-    "idle": 100.14359637715567
+    "total": 96.0534904863354,
+    "options": 93.5277101422625,
+    "sector": 96.61929722762919,
+    "straddle": 104.55278725658134,
+    "herd": 95.24264192495697,
+    "herd_realized_base": 93.67666364631675
   },
   "positions": {
     "options": {
@@ -16,19 +17,21 @@
       "entry_spot": null,
       "entry_vix": null,
       "entry_premium_est": null,
-      "exit_date_target": null
+      "exit_date_target": null,
+      "regime_sizing": 0.12
     },
     "sector": {
-      "active_sector": null,
-      "since": "2026-06-03",
-      "entry_sector_close": 40814.6015625
+      "active_sector": "cnxpharma",
+      "since": "2026-08-21",
+      "entry_sector_close": 26416.0
     },
     "straddle": {
-      "active": true,
-      "entry_date": "2026-06-01",
-      "premium": 945.76,
-      "entry_spot": 23559.55,
-      "expiry": "2026-06-25"
+      "active": false,
+      "entry_date": null,
+      "premium": null,
+      "entry_spot": null,
+      "expiry": null,
+      "entry_nav": 100.009032
     }
   },
   "trades": [
@@ -42,6 +45,180 @@
       "premium_pct": 4.014,
       "dte": 24,
       "expiry": "2026-06-25"
+    },
+    {
+      "strategy": "straddle",
+      "type": "EXIT",
+      "date": "2026-06-25",
+      "entry_date": "2026-06-01",
+      "expiry": "2026-06-25",
+      "entry_spot": 23559.55,
+      "exit_spot": 24056.0,
+      "spot_move_pts": 496.5,
+      "premium": 945.8,
+      "pnl_pts": 449.3,
+      "pnl_pct": 47.51,
+      "nav_change_pct": 1.425
+    },
+    {
+      "strategy": "straddle",
+      "type": "ENTRY",
+      "date": "2026-08-21",
+      "spot": 24239.8,
+      "vix": 11.15,
+      "premium_est": 794.03,
+      "premium_pct": 3.276,
+      "dte": 34,
+      "expiry": "2026-09-24"
+    },
+    {
+      "strategy": "options",
+      "type": "ENTRY",
+      "date": "2026-08-24",
+      "direction": "PUT",
+      "bull_score": 2,
+      "bear_score": 5,
+      "adx_14": 40.08507316301371,
+      "entry_spot": 24243.75,
+      "entry_vix": 11.52750015258789,
+      "entry_premium_est": 121.97063417061386,
+      "premium_pct_of_spot": 0.503,
+      "regime_sizing": 0.03
+    },
+    {
+      "strategy": "options",
+      "type": "EXIT",
+      "date": "2026-09-01",
+      "direction": "PUT",
+      "entry_spot": 24243.75,
+      "exit_spot": 24055.80078125,
+      "entry_premium_est": 121.97063417061386,
+      "exit_premium_est": 98.49508453932849,
+      "pnl_pct_on_premium": -19.25,
+      "nav_contribution_pct": -0.58,
+      "options_nav_after": 99.4226
+    },
+    {
+      "strategy": "options",
+      "type": "ENTRY",
+      "date": "2026-09-07",
+      "direction": "PUT",
+      "bull_score": 1,
+      "bear_score": 6,
+      "adx_14": 53.03418267145205,
+      "entry_spot": 23779.150390625,
+      "entry_vix": 11.15999984741211,
+      "entry_premium_est": 115.81928260260713,
+      "premium_pct_of_spot": 0.487,
+      "regime_sizing": 0.12
+    },
+    {
+      "strategy": "options",
+      "type": "EXIT",
+      "date": "2026-09-08",
+      "direction": "PUT",
+      "entry_spot": 23779.150390625,
+      "exit_spot": 23635.099609375,
+      "entry_premium_est": 115.81928260260713,
+      "exit_premium_est": 94.58274069746344,
+      "pnl_pct_on_premium": -18.34,
+      "nav_contribution_pct": -2.2,
+      "options_nav_after": 97.235
+    },
+    {
+      "strategy": "options",
+      "type": "ENTRY",
+      "date": "2026-09-21",
+      "direction": "PUT",
+      "bull_score": 1,
+      "bear_score": 6,
+      "adx_14": 59.578092561214824,
+      "entry_spot": 23414.30078125,
+      "entry_vix": 11.25,
+      "entry_premium_est": 114.96193465129477,
+      "premium_pct_of_spot": 0.491,
+      "regime_sizing": 0.03
+    },
+    {
+      "strategy": "options",
+      "type": "EXIT",
+      "date": "2026-09-22",
+      "direction": "PUT",
+      "entry_spot": 23414.30078125,
+      "exit_spot": 23329.0,
+      "entry_premium_est": 114.96193465129477,
+      "exit_premium_est": 91.44575018443258,
+      "pnl_pct_on_premium": -20.46,
+      "nav_contribution_pct": -0.61,
+      "options_nav_after": 96.6383
+    },
+    {
+      "strategy": "straddle",
+      "type": "EXIT",
+      "date": "2026-09-24",
+      "entry_date": "2026-08-21",
+      "expiry": "2026-09-24",
+      "entry_spot": 24239.8,
+      "exit_spot": 23063.099609375,
+      "spot_move_pts": 1176.7,
+      "premium": 794.0,
+      "pnl_pts": -382.7,
+      "pnl_pct": -48.19,
+      "nav_change_pct": -7.229
+    },
+    {
+      "strategy": "options",
+      "type": "ENTRY",
+      "date": "2026-09-28",
+      "direction": "PUT",
+      "bull_score": 0,
+      "bear_score": 7,
+      "adx_14": 52.361641553128024,
+      "entry_spot": 22780.25,
+      "entry_vix": 13.640000343322754,
+      "entry_premium_est": 135.61046821899683,
+      "premium_pct_of_spot": 0.595,
+      "regime_sizing": 0.03
+    },
+    {
+      "strategy": "options",
+      "type": "EXIT",
+      "date": "2026-09-29",
+      "direction": "PUT",
+      "entry_spot": 22780.25,
+      "exit_spot": 22716.19921875,
+      "entry_premium_est": 135.61046821899683,
+      "exit_premium_est": 108.5523326762485,
+      "pnl_pct_on_premium": -19.95,
+      "nav_contribution_pct": -0.6,
+      "options_nav_after": 96.0598
+    },
+    {
+      "strategy": "options",
+      "type": "ENTRY",
+      "date": "2026-10-26",
+      "direction": "PUT",
+      "bull_score": 2,
+      "bear_score": 5,
+      "adx_14": 41.33955619300473,
+      "entry_spot": 22753.19921875,
+      "entry_vix": 17.15999984741211,
+      "entry_premium_est": 170.40412253382314,
+      "premium_pct_of_spot": 0.749,
+      "regime_sizing": 0.12
+    },
+    {
+      "strategy": "options",
+      "type": "EXIT",
+      "date": "2026-10-27",
+      "direction": "PUT",
+      "entry_spot": 22753.19921875,
+      "exit_spot": 22749.75,
+      "entry_premium_est": 170.40412253382314,
+      "exit_premium_est": 132.97236644037716,
+      "pnl_pct_on_premium": -21.97,
+      "nav_contribution_pct": -2.64,
+      "options_nav_after": 93.5277
     }
   ],
   "daily_nav_history": [
@@ -88,7 +265,535 @@
       "sector": 96.3157,
       "straddle": 100.0,
       "idle": 100.1436
+    },
+    {
+      "date": "2026-06-04",
+      "total": 98.2148,
+      "options": 100.0,
+      "sector": 96.3434,
+      "straddle": 100.0,
+      "idle": 100.1723
+    },
+    {
+      "date": "2026-06-15",
+      "total": 98.2358,
+      "options": 100.0,
+      "sector": 96.371,
+      "straddle": 100.0,
+      "idle": 100.2011
+    },
+    {
+      "date": "2026-06-15",
+      "total": 98.3203,
+      "options": 100.0,
+      "sector": 96.3987,
+      "straddle": 101.2693,
+      "idle": 100.2299
+    },
+    {
+      "date": "2026-06-15",
+      "total": 98.3413,
+      "options": 100.0,
+      "sector": 96.4264,
+      "straddle": 101.2693,
+      "idle": 100.2586
+    },
+    {
+      "date": "2026-06-15",
+      "total": 98.3623,
+      "options": 100.0,
+      "sector": 96.454,
+      "straddle": 101.2693,
+      "idle": 100.2874
+    },
+    {
+      "date": "2026-06-19",
+      "total": 98.4484,
+      "options": 100.0,
+      "sector": 96.4817,
+      "straddle": 102.5692,
+      "idle": 100.3162
+    },
+    {
+      "date": "2026-06-19",
+      "total": 98.4286,
+      "options": 100.0,
+      "sector": 96.5094,
+      "straddle": 101.7532,
+      "idle": 100.345
+    },
+    {
+      "date": "2026-06-25",
+      "total": 98.4122,
+      "options": 100.0,
+      "sector": 96.5094,
+      "straddle": 101.4252,
+      "idle": 100.345
+    },
+    {
+      "date": "2026-07-23",
+      "total": 98.4333,
+      "options": 100.0,
+      "sector": 96.5371,
+      "straddle": 101.4252,
+      "idle": 100.3738
+    },
+    {
+      "date": "2026-08-07",
+      "total": 98.4543,
+      "options": 100.0,
+      "sector": 96.5648,
+      "straddle": 101.4252,
+      "idle": 100.4026
+    },
+    {
+      "date": "2026-08-10",
+      "total": 98.4754,
+      "options": 100.0,
+      "sector": 96.5925,
+      "straddle": 101.4252,
+      "idle": 100.4314
+    },
+    {
+      "date": "2026-08-11",
+      "total": 98.4965,
+      "options": 100.0,
+      "sector": 96.6203,
+      "straddle": 101.4252,
+      "idle": 100.4602
+    },
+    {
+      "date": "2026-08-21",
+      "total": 98.8119,
+      "options": 100.0,
+      "sector": 96.648,
+      "straddle": 101.4252,
+      "herd": 101.6664
+    },
+    {
+      "date": "2026-08-21",
+      "total": 99.7897,
+      "options": 100.0,
+      "sector": 96.6757,
+      "straddle": 99.9941,
+      "herd": 105.8085
+    },
+    {
+      "date": "2026-08-21",
+      "total": 101.8518,
+      "options": 100.0,
+      "sector": 100.8756,
+      "straddle": 100.009,
+      "herd": 105.6542
+    },
+    {
+      "date": "2026-08-24",
+      "total": 101.8017,
+      "options": 100.0,
+      "sector": 100.9935,
+      "straddle": 100.1955,
+      "herd": 105.1809
+    },
+    {
+      "date": "2026-08-26",
+      "total": 102.1995,
+      "options": 100.0,
+      "sector": 101.8311,
+      "straddle": 101.6181,
+      "herd": 104.8123
+    },
+    {
+      "date": "2026-08-27",
+      "total": 102.5689,
+      "options": 100.0,
+      "sector": 102.5482,
+      "straddle": 101.8276,
+      "herd": 104.8136
+    },
+    {
+      "date": "2026-08-28",
+      "total": 103.1031,
+      "options": 100.0,
+      "sector": 103.6413,
+      "straddle": 102.2367,
+      "herd": 104.6825,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-08-31",
+      "total": 103.627,
+      "options": 100.0,
+      "sector": 105.1357,
+      "straddle": 102.4419,
+      "herd": 103.7481,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-01",
+      "total": 101.8688,
+      "options": 99.4226,
+      "sector": 102.0899,
+      "straddle": 102.3896,
+      "herd": 103.2795,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-02",
+      "total": 101.7371,
+      "options": 99.4226,
+      "sector": 101.9988,
+      "straddle": 102.6327,
+      "herd": 102.886,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-03",
+      "total": 101.513,
+      "options": 99.4226,
+      "sector": 101.0691,
+      "straddle": 103.1984,
+      "herd": 103.736,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-04",
+      "total": 100.9554,
+      "options": 99.4226,
+      "sector": 99.7001,
+      "straddle": 104.143,
+      "herd": 104.0548,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-07",
+      "total": 102.4691,
+      "options": 99.4226,
+      "sector": 101.1867,
+      "straddle": 104.5928,
+      "herd": 107.0465,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-08",
+      "total": 102.7958,
+      "options": 97.235,
+      "sector": 102.7442,
+      "straddle": 104.902,
+      "herd": 106.9266,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-09",
+      "total": 101.8842,
+      "options": 97.235,
+      "sector": 101.2994,
+      "straddle": 104.7111,
+      "herd": 106.208,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-10",
+      "total": 102.0388,
+      "options": 97.235,
+      "sector": 100.2675,
+      "straddle": 105.1411,
+      "herd": 108.804,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-11",
+      "total": 101.6821,
+      "options": 97.235,
+      "sector": 100.0904,
+      "straddle": 105.1388,
+      "herd": 107.7318,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-15",
+      "total": 99.2948,
+      "options": 97.235,
+      "sector": 97.495,
+      "straddle": 106.1421,
+      "herd": 103.1727,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-16",
+      "total": 99.0565,
+      "options": 97.235,
+      "sector": 97.1808,
+      "straddle": 106.776,
+      "herd": 102.7214,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-17",
+      "total": 100.9954,
+      "options": 97.235,
+      "sector": 100.3999,
+      "straddle": 107.8061,
+      "herd": 103.8324,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-18",
+      "total": 101.9154,
+      "options": 97.235,
+      "sector": 101.3885,
+      "straddle": 108.8088,
+      "herd": 105.3348,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-21",
+      "total": 103.2292,
+      "options": 97.235,
+      "sector": 103.7499,
+      "straddle": 110.6665,
+      "herd": 105.4956,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-22",
+      "total": 102.5577,
+      "options": 96.6383,
+      "sector": 102.8933,
+      "straddle": 111.5551,
+      "herd": 104.8225,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-23",
+      "total": 103.8381,
+      "options": 96.6383,
+      "sector": 104.7478,
+      "straddle": 112.6999,
+      "herd": 106.0063,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-24",
+      "total": 101.3505,
+      "options": 96.6383,
+      "sector": 103.7957,
+      "straddle": 104.5528,
+      "herd": 99.5893,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-25",
+      "total": 101.3558,
+      "options": 96.6383,
+      "sector": 103.5983,
+      "straddle": 104.5528,
+      "herd": 100.0053,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-28",
+      "total": 99.3298,
+      "options": 96.6383,
+      "sector": 101.7464,
+      "straddle": 104.5528,
+      "herd": 95.6052,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-29",
+      "total": 99.4497,
+      "options": 96.0598,
+      "sector": 103.0543,
+      "straddle": 104.5528,
+      "herd": 93.9317,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-09-30",
+      "total": 97.6294,
+      "options": 96.0598,
+      "sector": 99.2613,
+      "straddle": 104.5528,
+      "herd": 94.2366,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-01",
+      "total": 97.0135,
+      "options": 96.0598,
+      "sector": 98.3118,
+      "straddle": 104.5528,
+      "herd": 93.6719,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-05",
+      "total": 96.221,
+      "options": 96.0598,
+      "sector": 96.8587,
+      "straddle": 104.5528,
+      "herd": 93.4082,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-06",
+      "total": 97.8317,
+      "options": 96.0598,
+      "sector": 100.0667,
+      "straddle": 104.5528,
+      "herd": 93.435,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-07",
+      "total": 97.4123,
+      "options": 96.0598,
+      "sector": 99.2145,
+      "straddle": 104.5528,
+      "herd": 93.4618,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-08",
+      "total": 95.1173,
+      "options": 96.0598,
+      "sector": 94.6111,
+      "straddle": 104.5528,
+      "herd": 93.4887,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-09",
+      "total": 95.6326,
+      "options": 96.0598,
+      "sector": 95.6282,
+      "straddle": 104.5528,
+      "herd": 93.5155,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-12",
+      "total": 96.0695,
+      "options": 96.0598,
+      "sector": 96.4886,
+      "straddle": 104.5528,
+      "herd": 93.5423,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-13",
+      "total": 96.062,
+      "options": 96.0598,
+      "sector": 96.4602,
+      "straddle": 104.5528,
+      "herd": 93.5692,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-14",
+      "total": 94.8181,
+      "options": 96.0598,
+      "sector": 93.959,
+      "straddle": 104.5528,
+      "herd": 93.596,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-15",
+      "total": 95.12,
+      "options": 96.0598,
+      "sector": 94.5494,
+      "straddle": 104.5528,
+      "herd": 93.6229,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-16",
+      "total": 94.9943,
+      "options": 96.0598,
+      "sector": 94.2846,
+      "straddle": 104.5528,
+      "herd": 93.6498,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-19",
+      "total": 94.3916,
+      "options": 96.0598,
+      "sector": 93.0657,
+      "straddle": 104.5528,
+      "herd": 93.6767,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-21",
+      "total": 93.4793,
+      "options": 96.0598,
+      "sector": 92.7089,
+      "straddle": 104.5528,
+      "herd": 90.7408
+    },
+    {
+      "date": "2026-10-22",
+      "total": 93.659,
+      "options": 96.0598,
+      "sector": 92.5761,
+      "straddle": 104.5528,
+      "herd": 91.7255
+    },
+    {
+      "date": "2026-10-23",
+      "total": 92.1854,
+      "options": 96.0598,
+      "sector": 90.6433,
+      "straddle": 104.5528,
+      "herd": 89.6966
+    },
+    {
+      "date": "2026-10-26",
+      "total": 94.1879,
+      "options": 96.0598,
+      "sector": 93.8268,
+      "straddle": 104.5528,
+      "herd": 91.3394,
+      "mode": "replayed"
+    },
+    {
+      "date": "2026-10-27",
+      "total": 95.0851,
+      "options": 93.5277,
+      "sector": 95.6215,
+      "straddle": 104.5528,
+      "herd": 93.3649
+    },
+    {
+      "date": "2026-10-28",
+      "total": 96.0535,
+      "options": 93.5277,
+      "sector": 96.6193,
+      "straddle": 104.5528,
+      "herd": 95.2426
     }
   ],
-  "signals_history": []
+  "signals_history": [],
+  "replay": {
+    "from_state_last_run": "2026-10-23",
+    "start": "2026-10-26",
+    "end": "2026-10-26",
+    "days": 1,
+    "run_at": "2026-10-27T08:21:25",
+    "note": "Paper trader did not run 2026-08-28..10-19; these days were replayed afterwards with data cut at each day."
+  },
+  "sector_leverage_history": [
+    {
+      "until": "2026-10-26",
+      "leverage": 2.0,
+      "note": "applied without borrowing cost"
+    },
+    {
+      "from": "2026-10-27",
+      "leverage": 1.0,
+      "note": "unlevered at Daniel's request; matches published 1x figures"
+    }
+  ]
 }

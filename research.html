@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Research — CausalAlpha</title>
+<title>Research: CausalAlpha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -11,8 +11,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="shared.js"></script>
 <style>
-.finding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 48px; }
-.finding-cell { background: var(--ground); padding: 28px 32px; }
+.finding-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 48px; }
+.finding-cell { background: var(--ground); padding: 28px 32px; min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 768px) { .finding-grid { grid-template-columns: minmax(0, 1fr); } .finding-cell { padding: 20px 16px; } }
 .finding-num { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); display: block; margin-bottom: 10px; }
 .finding-stat { font-family: var(--font-mono); font-size: 40px; font-weight: 500; color: var(--amber); display: block; line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px; }
 .finding-cell h3 { font-family: var(--font-serif); font-size: 20px; font-weight: 400; margin-bottom: 8px; }
@@ -39,19 +40,19 @@
         <span class="finding-num">Finding 01</span>
         <span class="finding-stat">3%</span>
         <h3>Signal Hit Rate After Significance Testing</h3>
-        <p>368 signals tested. Only 11 pass p&lt;0.05 — a 3% hit rate consistent with random selection under multiple-comparison correction. Best individual signals: ADX_14 (lift +4.4%, p=0.015), gap_pct (lift +3.8%, p=0.024).</p>
+        <p>368 signals tested. Only 11 pass p&lt;0.05, a 3% hit rate consistent with random selection under multiple-comparison correction. Best individual signals: ADX_14 (lift +4.4%, p=0.015), gap_pct (lift +3.8%, p=0.024).</p>
       </div>
       <div class="finding-cell">
         <span class="finding-num">Finding 02</span>
-        <span class="finding-stat">−0.52</span>
-        <h3>Causal Filters Hurt Sharpe</h3>
-        <p>VIX+causal Sharpe is −0.52 versus VIX+MOM20 at +1.08. Causal relationships exist (SPY Granger-causes all Indian sectors, p&lt;1e−20) but are already embedded in the VIX signal — adding them creates noise, not edge.</p>
+        <span class="finding-stat">0 of 12</span>
+        <h3>Causal Links Did Not Survive</h3>
+        <p>PCMCI, run on the 2015 to 2020 training window with point-in-time data, found 12 tradeable causal links into sector returns. None survived a rank-based (robust) version of the same test; the strongest, from US bond yields, was carried by a few days in March 2020. As a filter on the volatility rule, the causal gate did no better than a correlation gate. Earlier figures on this page used data that was not available at decision time and are withdrawn.</p>
       </div>
       <div class="finding-cell">
         <span class="finding-num">Finding 03</span>
         <span class="finding-stat">T+1</span>
         <h3>Tuesday Close Beats Thursday Close</h3>
-        <p>T+1 exit (Tuesday close) consistently outperforms T+3 (Thursday close) across all signal combinations and periods tested. Confirmed robust across regime changes — applies to ADX33 variant as well as legacy signal sets.</p>
+        <p>T+1 exit (Tuesday close) consistently outperforms T+3 (Thursday close) across all signal combinations and periods tested. Held across the regime changes tested.</p>
       </div>
     </div>
   </div>
@@ -62,14 +63,15 @@
   <div class="container">
     <p class="section-label">Signal Combination Research</p>
     <div class="filter-bar reveal">
-      <label>Min Accuracy</label>
+      <label for="acc-filter">Min Accuracy</label>
       <input type="range" id="acc-filter" min="50" max="85" value="70" step="1">
       <span class="filter-val" id="acc-filter-val">70%</span>
-      <label style="margin-left:16px;">Min Trades</label>
+      <label for="n-filter" style="margin-left:16px;">Min Trades</label>
       <input type="range" id="n-filter" min="5" max="50" value="20" step="5">
       <span class="filter-val" id="n-filter-val">20</span>
       <span id="combo-count" style="font-family:var(--font-mono);font-size:10px;color:var(--ink-muted);margin-left:auto;"></span>
     </div>
+    <div id="signal-error"></div>
     <div class="table-wrap reveal">
       <table class="data-table" id="signal-table">
         <thead><tr>
@@ -101,19 +103,19 @@
     <p class="section-label">Methodology</p>
     <div class="method-grid reveal">
       <div class="method-card">
-        <span class="method-num">01 — Regime Classification</span>
+        <span class="method-num">01: Regime Classification</span>
         <h3>BIC-Optimal GMM</h3>
-        <p>Market regimes identified via walk-forward GMM (k=4–7 selected by BIC) on 7 features: VIX level, VIX trend, Nifty momentum, rate acceleration, vol ratio, IT/bank sector dispersion, and SPX correlation. Regime-conditional strategy routing replaces one-size-fits-all signals.</p>
+        <p>Market regimes identified by a Gaussian mixture refit on an expanding window (k=4–7 selected by BIC) on 7 features: VIX level, VIX trend, Nifty momentum, rate acceleration, vol ratio, IT/bank sector dispersion, and SPX correlation. Used for research only; no reported result depends on it.</p>
       </div>
       <div class="method-card">
-        <span class="method-num">02 — Signal Validation</span>
+        <span class="method-num">02: Signal Validation</span>
         <h3>DSR + Per-Regime Testing</h3>
-        <p>Each signal tested via Deflated Sharpe Ratio (adjusts for number of strategies trialled) and Mann-Whitney U test per regime. Only signals with DSR &gt; 0 and p&lt;0.05 per relevant regime are retained. VIX_GATE is the only strategy passing all tests.</p>
+        <p>Each signal tested via Deflated Sharpe Ratio (adjusts for number of strategies trialled) and Mann-Whitney U test per regime. Only signals with DSR &gt; 0 and p&lt;0.05 per relevant regime are retained. In the pre-registered test no strategy, VIX_GATE included, shows statistical evidence of an edge (see Overview).</p>
       </div>
       <div class="method-card">
-        <span class="method-num">03 — OOS Protocol</span>
-        <h3>Strict Walk-Forward</h3>
-        <p>All results on strictly out-of-sample data. Expanding window refit with 21-day purge gap. Pre-2022 / post-2022 split as natural regime boundary. Bootstrap CI and PSR computed. Overfit audit maps each component to its valid regime and IS vs OOS Sharpe.</p>
+        <span class="method-num">03: OOS Protocol</span>
+        <h3>Pre-registered holdout</h3>
+        <p>The rules were frozen and committed before three untouched sectors (Auto, Metal, Realty) were downloaded; the headline is that test, from 2021 onward. The design sectors' 2023 onward results were seen during design, so they are labelled as reused. Every variant tried was counted for the deflated Sharpe ratio, SPA test and overfitting probability.</p>
       </div>
     </div>
   </div>
@@ -132,7 +134,10 @@ parseCSV('data/results/signal_research_combos.csv').then(rows => {
   renderSignalTable(filterCombos());
   buildTopChart(allCombos.sort((a, b) => b.acc - a.acc).slice(0, 15));
   initSortableTable('signal-table');
-}).catch(() => {});
+}).catch(err => {
+  loadError(document.getElementById('signal-error'), 'signal_research_combos.csv', err);
+  document.getElementById('combo-count').textContent = 'unavailable';
+});
 
 function filterCombos() {
   const minAcc = parseInt(document.getElementById('acc-filter').value) / 100;
@@ -148,13 +153,13 @@ function renderSignalTable(rows) {
     const comboParts = r.combo.split('+').map(s => s.replace('bin_', '').replace(/_/g, ' ')).join(' + ');
     const stabCls = r.stability > 0 ? 'pos' : 'neg';
     return `<tr>
-      <td data-col="combo" data-val="${r.combo}" style="font-size:10px;max-width:400px;word-break:break-all;">${comboParts}</td>
-      <td data-col="n" data-val="${r.n}">${r.n}</td>
-      <td data-col="acc" data-val="${r.acc}" class="${r.acc >= 0.75 ? 'pos' : ''}">${(r.acc * 100).toFixed(1)}%</td>
-      <td data-col="acc_pre2022" data-val="${r.acc_pre2022}">${(r.acc_pre2022 * 100).toFixed(1)}%</td>
-      <td data-col="acc_post2022" data-val="${r.acc_post2022}">${(r.acc_post2022 * 100).toFixed(1)}%</td>
-      <td data-col="stability" data-val="${r.stability}" class="${stabCls}">${(r.stability * 100).toFixed(1)}%</td>
-      <td data-col="p_value" data-val="${r.p_value}" class="${r.p_value < 0.05 ? 'pos' : ''}">${r.p_value.toFixed(4)}</td>
+      <td data-col="combo" data-val="${esc(r.combo)}" style="font-size:10px;max-width:400px;word-break:break-all;">${esc(comboParts)}</td>
+      <td data-col="n" data-val="${esc(r.n)}">${esc(r.n)}</td>
+      <td data-col="acc" data-val="${esc(r.acc)}" class="${r.acc >= 0.75 ? 'pos' : ''}">${(r.acc * 100).toFixed(1)}%</td>
+      <td data-col="acc_pre2022" data-val="${esc(r.acc_pre2022)}">${(r.acc_pre2022 * 100).toFixed(1)}%</td>
+      <td data-col="acc_post2022" data-val="${esc(r.acc_post2022)}">${(r.acc_post2022 * 100).toFixed(1)}%</td>
+      <td data-col="stability" data-val="${esc(r.stability)}" class="${stabCls}">${(r.stability * 100).toFixed(1)}%</td>
+      <td data-col="p_value" data-val="${esc(r.p_value)}" class="${r.p_value < 0.05 ? 'pos' : ''}">${r.p_value.toFixed(4)}</td>
     </tr>`;
   }).join('');
 }

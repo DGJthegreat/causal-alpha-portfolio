@@ -1,6 +1,22 @@
-// CausalAlpha Shared JS — nav, data loading, chart utils
+// CausalAlpha Shared JS: nav, data loading, chart utils
 
-// ——— NAV ———
+// --- ESCAPING ---
+// Every data field interpolated into innerHTML goes through esc(). Data files
+// (CSV/JSON/Markdown) include LLM-written text, so they are untrusted.
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Visible, announced failure for any data load (never a silent catch).
+function loadError(el, what, err) {
+  if (!el) return;
+  el.innerHTML = '<div class="callout fail load-error" role="alert"><strong>' + esc(what) + ' unavailable</strong>' +
+    '<p>Could not load ' + esc(what) + ' (' + esc(err && err.message || err) + '). Nothing is shown rather than stale data.</p></div>';
+}
+
+// --- NAV ---
 const NAV_PAGES = [
   { id: 'overview',   label: 'Overview',   href: 'index.html' },
   { id: 'backtest',   label: 'Backtest',   href: 'backtest.html' },
@@ -23,7 +39,7 @@ function renderNav(activePage) {
   document.body.insertAdjacentHTML('afterbegin', html);
 }
 
-// ——— DATA LOADING ———
+// --- DATA LOADING ---
 async function parseCSV(path) {
   return new Promise((resolve, reject) => {
     Papa.parse(path, {
@@ -46,7 +62,104 @@ async function loadMarkdown(path) {
   return r.text();
 }
 
-// ——— MATH UTILS ———
+// --- HEADLINE (single source: headline.json, built by gen_headline.py) ---
+const HEADLINE_URL = 'headline.json';
+
+async function loadHeadline() {
+  const h = await loadJSON(HEADLINE_URL);
+  const need = ['period', 'strategy', 'bh', 'matched_mix', 'approaches', 'dsr', 'spa_p', 'edge'];
+  const missing = need.filter(k => h[k] == null);
+  if (missing.length) throw new Error('headline.json missing ' + missing.join(', '));
+  if (!Array.isArray(h.approaches) || !h.approaches.length) throw new Error('headline.json has no approaches');
+  return h;
+}
+
+// Signed number with a true minus sign (U+2212).
+function fmtSigned(v, d = 1, suffix = '') {
+  const n = Number(v);
+  if (!isFinite(n)) return 'n/a';
+  return (n < 0 ? '−' : '') + Math.abs(n).toFixed(d) + suffix;
+}
+
+function fmtMonthYear(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+function fmtDayMonthYear(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
+function headlineBasis(h) {
+  return h.basis + ' · ' + fmtMonthYear(h.period.start) + ' to ' + fmtDayMonthYear(h.period.end);
+}
+
+// Plain-English verdict, derived from the numbers rather than asserted.
+function headlineVerdict(h) {
+  const best = h.approaches.reduce((a, b) => (b.sharpe > a.sharpe ? b : a));
+  if (!h.edge && best.sharpe < h.bh.sharpe) {
+    return 'No timing rule, causal-discovery filter or reinforcement-learning agent beat buy-and-hold after costs.';
+  }
+  return 'At least one approach passed the pre-registered test; see the statistics below.';
+}
+
+function headlineEvidence(h) {
+  const mixSmaller = h.matched_mix.maxdd > h.strategy.maxdd;
+  return 'VIX_GATE was invested ' + h.strategy.exposure + '% of the time' +
+    (mixSmaller ? ', and a fixed ' + h.matched_mix.exposure + '% index mix had a smaller worst fall (' +
+      fmtSigned(h.matched_mix.maxdd, 1, '%') + ' against ' + fmtSigned(h.strategy.maxdd, 1, '%') +
+      '), so its smaller drawdowns came from holding less, not from timing. ' : '. ') +
+    'Deflated Sharpe ratio ' + fmtSigned(h.dsr, 2) + ' after ' + h.dsr_trials.toLocaleString('en-GB') +
+    ' strategy variants; Hansen’s SPA test p = ' + fmtSigned(h.spa_p, 2) + '. ' +
+    (h.edge ? '' : 'There is no statistical evidence of an edge.');
+}
+
+// One-line summary above the approaches table (kept under its old name: pages call it).
+function headlineRegimes(h) {
+  const beat = h.approaches.filter(a => a.sharpe > h.bh.sharpe).length;
+  return h.approaches.length + ' approaches on the same sectors, data, timing and costs; ' +
+    (beat === 0 ? 'none' : beat) + ' beat buy-and-hold. Causal links that survived a rank-based test: ' +
+    h.pcmci_links_robust + ' of ' + h.pcmci_links_parcorr + '.';
+}
+
+// [{label, value, sub, cls}] for the three headline numbers.
+function headlineCells(h) {
+  return [
+    { label: 'Sharpe ratio, above cash', value: fmtSigned(h.strategy.sharpe, 2),
+      sub: 'Buy and hold: ' + fmtSigned(h.bh.sharpe, 2), cls: h.strategy.sharpe < h.bh.sharpe ? 'red' : 'green' },
+    { label: 'Worst fall', value: fmtSigned(h.strategy.maxdd, 1, '%'),
+      sub: 'Buy and hold: ' + fmtSigned(h.bh.maxdd, 1, '%'), cls: 'amber' },
+    { label: 'Time invested', value: h.strategy.exposure + '%',
+      sub: 'Buy and hold: ' + h.bh.exposure + '%', cls: 'amber' },
+  ];
+}
+
+// Approaches table (kept under its old name: pages call it). Buy-and-hold first.
+function headlineRegimeTable(h) {
+  const row = (label, s, isBench) =>
+    '<tr' + (isBench ? ' class="bench"' : '') + '><td>' + esc(label) + '</td>' +
+    '<td class="' + (isBench ? '' : (s.sharpe > h.bh.sharpe ? 'pos' : 'neg')) + '">' + fmtSigned(s.sharpe, 2) + '</td>' +
+    '<td>' + fmtSigned(s.maxdd, 1, '%') + '</td><td>' + s.exposure + '%</td></tr>';
+  const rows = row('Buy and hold', h.bh, true) + h.approaches.map(a => row(a.label, a, false)).join('');
+  return '<table class="data-table regime-table"><thead><tr><th>Approach</th>' +
+    '<th>Sharpe ratio, above cash</th><th>Worst fall</th><th>Time invested</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+// Visible failure instead of silently showing stale or invented numbers.
+function headlineError(el, err) {
+  if (!el) return;
+  el.innerHTML = '<div class="callout fail headline-error" role="alert"><strong>Headline figures unavailable</strong>' +
+    '<p>Could not load headline.json (' + esc(err && err.message || err) + '). No figures are shown rather than outdated ones.</p></div>';
+}
+
+// --- LIVE REGIME BADGE (data/live/latest_signal.json: {date, regime, vix_signal, summary}) ---
+async function loadLatestSignal() {
+  const s = await loadJSON('data/live/latest_signal.json');
+  if (!s || !s.date || !s.regime) throw new Error('latest_signal.json missing date or regime');
+  return s;
+}
+
+// --- MATH UTILS ---
 function dailyReturns(navArr) {
   const ret = [];
   for (let i = 1; i < navArr.length; i++) {
@@ -55,7 +168,10 @@ function dailyReturns(navArr) {
   return ret;
 }
 
-function calcSharpe(returns, annFactor = 52) {
+// annFactor: periods per year. Daily returns -> 252, weekly -> 52. No default:
+// a wrong default silently mis-annualised daily data by sqrt(52/252).
+function calcSharpe(returns, annFactor) {
+  if (!annFactor) throw new Error('calcSharpe: annFactor required (252 daily, 52 weekly)');
   if (returns.length < 2) return 0;
   const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
   const variance = returns.reduce((a, b) => a + (b - mean) ** 2, 0) / (returns.length - 1);
@@ -90,30 +206,30 @@ function calcYears(dates) {
   return (b - a) / (365.25 * 24 * 3600 * 1000);
 }
 
-// ——— FORMATTERS ———
+// --- FORMATTERS ---
 function fmtPct(v, d = 1) {
-  if (v == null || isNaN(v)) return '—';
+  if (v == null || isNaN(v)) return 'n/a';
   return (v * 100).toFixed(d) + '%';
 }
 
 function fmtPctRaw(v, d = 1) {
-  if (v == null || isNaN(v)) return '—';
+  if (v == null || isNaN(v)) return 'n/a';
   const pct = parseFloat(v) * 100;
   return (pct >= 0 ? '+' : '') + pct.toFixed(d) + '%';
 }
 
 function fmtSharpe(v) {
-  if (v == null || isNaN(v)) return '—';
+  if (v == null || isNaN(v)) return 'n/a';
   return parseFloat(v).toFixed(2);
 }
 
 function fmtNum(v, d = 2) {
-  if (v == null || isNaN(v)) return '—';
+  if (v == null || isNaN(v)) return 'n/a';
   return parseFloat(v).toFixed(d);
 }
 
 function fmtDate(d) {
-  if (!d) return '—';
+  if (!d) return 'n/a';
   return String(d).slice(0, 10);
 }
 
@@ -121,7 +237,7 @@ function fmtINR(lakhs) {
   return '₹' + lakhs + 'L';
 }
 
-// ——— CHART.JS DEFAULTS ———
+// --- CHART.JS DEFAULTS ---
 function chartDefaults() {
   return {
     responsive: true,
@@ -218,7 +334,7 @@ function lineDataset(label, data, color, opts = {}) {
   };
 }
 
-// ——— TABS ———
+// --- TABS ---
 function initTabs(containerSelector) {
   const container = document.querySelector(containerSelector) || document;
   container.querySelectorAll('.tab-btn').forEach(btn => {
@@ -233,7 +349,7 @@ function initTabs(containerSelector) {
   });
 }
 
-// ——— SORTABLE TABLE ———
+// --- SORTABLE TABLE ---
 function initSortableTable(tableId) {
   const table = document.getElementById(tableId);
   if (!table) return;
@@ -259,7 +375,7 @@ function initSortableTable(tableId) {
   });
 }
 
-// ——— SCROLL REVEALS ———
+// --- SCROLL REVEALS ---
 function initReveal() {
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
@@ -267,9 +383,11 @@ function initReveal() {
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 }
 
-// ——— MARKDOWN RENDERER (simple) ———
+// --- MARKDOWN RENDERER (simple) ---
+// The source is escaped first, so any HTML in the report renders as text;
+// the formatting regexes below then only ever emit their own tags.
 function renderMarkdown(md) {
-  return md
+  return esc(md)
     .replace(/^### (.+)$/gm, '<h4>$1</h4>')
     .replace(/^## (.+)$/gm, '<h3>$1</h3>')
     .replace(/^# (.+)$/gm, '<h2>$1</h2>')
@@ -288,4 +406,20 @@ function renderMarkdown(md) {
     .replace(/\n{2,}/g, '');
 }
 
+// Straddle failed out-of-sample and is frozen: say so wherever a report names it.
+function markFrozenStraddle(html) {
+  return html.replace(/Straddle (sub-account|Gates)/g,
+    'Straddle $1 <span class="badge fail frozen-tag">frozen, failed out-of-sample</span>');
+}
+
+// Horizontally scrollable table wrappers must be reachable by keyboard (WCAG 2.1.1).
+function initScrollRegions() {
+  document.querySelectorAll('.table-wrap').forEach(el => {
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    if (!el.hasAttribute('role')) el.setAttribute('role', 'region');
+    if (!el.hasAttribute('aria-label')) el.setAttribute('aria-label', 'Scrollable table');
+  });
+}
+
 document.addEventListener('DOMContentLoaded', initReveal);
+document.addEventListener('DOMContentLoaded', initScrollRegions);

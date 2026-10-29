@@ -1,138 +1,125 @@
 {
-  "lastUpdated": "2026-06-02",
+  "lastUpdated": "2026-10-29",
   "working": [
     {
-      "title": "ADX+MOM20 Gate — Confirmed",
-      "desc": "Upgraded from VIX20+MOM20. PSR=1.000, fire rate 17% (was 37%), OOS CAGR +14.6% (was +7.4%). Full portfolio: CAGR +21.6%, Sharpe 1.18, MaxDD −25.9%, ₹82L. Gate-off now earns risk-free (was 1× — hidden bug fixed).",
-      "metric": "Sharpe 1.06 sector · 1.18 full portfolio · PSR=1.000"
+      "title": "Pre-registered test completed",
+      "desc": "Rules and test frozen and committed before three untouched sectors were downloaded; every number on the Overview page comes from that test via headline.json and is rebuilt by one command from frozen data.",
+      "metric": "Honest result, reproducible"
     },
     {
-      "title": "Weekly Directional ADX33",
-      "desc": "New signal set (RSI5+EMA200+crude+PCR+US10Y) with ADX≥33 gate. Sharpe held IS→OOS. Under surveillance — need 2–3 more years to confirm.",
-      "metric": "Sharpe 2.07 IS → 2.06 OOS · n=39"
+      "title": "Leverage cost bug fixed",
+      "desc": "2x leverage had been charged trading costs as if 1x. Fixed in the engine and covered by a test on 20 Oct 2026. The figures that replaced it were later withdrawn too, because they were measured on data that had helped choose the rule.",
+      "metric": "Corrections published Oct 2026"
     },
     {
-      "title": "Sector RS Rate-Shock Gate",
-      "desc": "Replaced overfit yield-level rule (4.2%) with sector-RS gate: IT 20d underperformance + rate acceleration. Fires 46% of 2022, 0% of 2023, 6.5% of 2024.",
-      "metric": "Generalised · replaces 2022-tuned rule"
+      "title": "Sector RS rate-shock gate",
+      "desc": "Replaced an overfit yield-level rule (4.2%) with a sector relative-strength gate: IT 20-day underperformance plus rate acceleration.",
+      "metric": "Generalised; replaces a 2022-tuned rule"
     },
     {
-      "title": "Straddle LIVE — June 1 Entry",
-      "desc": "First paper straddle active. Entry Jun 1, spot 23,560, premium 946 pts (4.01%). Expiry Jun 25. 7-gate check: all passed at entry (VIX, FII, VRP=+15.12, ATR, rate, mom_bleed, calendar). Gates synced with gate_monitor.py — now 7 gates (was 5).",
-      "metric": "946 pts entry · exp Jun 25 · 7-gate system"
-    },
-    {
-      "title": "Paper Trader Live",
-      "desc": "Running since 2026-05-30. Sector gate FLAT (ADX avg 0.32 < 0.40 — choppy regime, earning risk-free). Straddle active. Options idle (ADX < 33).",
-      "metric": "NAV 98.11 · sector flat · straddle live"
+      "title": "Paper trader running",
+      "desc": "Paper trading since 2026-05-30 on NSE sector rotation, with experimental options and a frozen straddle tracked separately. Current figures are on the Live page.",
+      "metric": "Paper only, no real capital"
     }
   ],
   "failed": [
     {
-      "title": "Weekly Dir S5 (no ADX)",
-      "desc": "Regime-specific: built on 2019–2021 low-vol market structure. IS Sharpe 1.58 → OOS -0.91. 157% IS→OOS collapse. Retired.",
-      "metric": "IS 1.58 → OOS −0.91"
+      "title": "No edge over buy-and-hold after costs",
+      "desc": "On untouched sectors from 2021, after costs, no timing rule, causal filter or reinforcement-learning agent beat buy-and-hold. VIX_GATE's shallower drawdowns came from holding less: a fixed index mix with the same exposure had a smaller worst fall.",
+      "metric": "No statistical evidence of an edge"
     },
     {
-      "title": "Causal Signal Filters",
-      "desc": "VIX+causal Sharpe -0.52 vs VIX+MOM20 +1.08. 368 signals tested — only 11 pass p<0.05 (3% hit rate). Causal filters actively hurt performance. Dropped.",
-      "metric": "Sharpe −0.52 · 3% significance rate"
+      "title": "Reinforcement-learning agents",
+      "desc": "GTrXL and MLP agents (five seeds each), trained only on the design sectors before 2021, did no better than plain momentum on the untouched sectors.",
+      "metric": "No better than momentum"
     },
     {
-      "title": "Sector Rotation Exclusions",
-      "desc": "Dropping IT/pharma in rate shock trained on single 2022 episode. Actual 2022 performance: rotation 4.6% vs baseline 6.6%. Exclusion logic underperformed buy-and-hold.",
-      "metric": "Overfit · baseline beat rotation in 2022"
+      "title": "Nifty straddle",
+      "desc": "Failed out-of-sample. Only 7.6% of a 576-combination parameter grid had a positive Sharpe ratio (research log section 16.7). Frozen.",
+      "metric": "Failed, frozen"
     },
     {
-      "title": "576-Parameter Grid",
-      "desc": "Straddle param grid CV=126% across combinations. Best combos have 9 trades — statistically meaningless. No IS/OOS declaration during search. Shelved.",
-      "metric": "CV 126% · Sharpe range [−1.91, +0.57]"
+      "title": "ADX+MOM20 blended portfolio",
+      "desc": "In-sample only; ADX threshold grid-searched on the same data; blend included the failed straddle. Earlier headline figures based on it are withdrawn.",
+      "metric": "Experimental, not validated"
     },
     {
-      "title": "No Bear/Rate-Shock Strategy",
-      "desc": "In rate-shock (2022): best strategy was DUAL_MOM at Sharpe 0.82 — barely above cash. In prolonged bear (china crash 2015): everything collapses, best was -0.95. Gap not filled.",
-      "metric": "No validated bear strategy exists"
+      "title": "Causal signal filters",
+      "desc": "Adding causal filters to the VIX gate lowered its Sharpe ratio. 368 signals tested, 11 pass p<0.05 (3%), about what chance predicts.",
+      "metric": "3% significance rate"
+    },
+    {
+      "title": "Weekly directional options",
+      "desc": "Direction signal real, but option time decay erased the edge and the signal set was chosen on the same data. Earlier Sharpe figures withdrawn.",
+      "metric": "Not validated"
+    },
+    {
+      "title": "No bear-market strategy",
+      "desc": "No validated strategy for a prolonged bear market.",
+      "metric": "Open gap"
     }
   ],
   "risks": [
     {
-      "title": "Pre-2017 Data Quality",
-      "desc": "NSE options 80–90% zero-volume pre-2017. Straddle backtest uses theoretical settle prices — unrealisable fills. Pre-2017 results overstate true edge by unknown amount."
+      "title": "Pre-2017 data quality",
+      "desc": "NSE options were 80 to 90% zero-volume before 2017. Option backtests there use theoretical settle prices."
     },
     {
-      "title": "GMM Feature Bug (Fixed)",
-      "desc": "NIFTY sector rows had null vol_regime/vix_level_z. drop_duplicates kept null rows, degrading GMM training silently. Fixed: filter to nsebank rows before dedup."
+      "title": "Multiple testing",
+      "desc": "Many strategies and parameters were tried on the same history. Deflated Sharpe ratios account for this and are near zero."
     },
     {
-      "title": "ADX Starved of Entries",
-      "desc": "ADX≥33 gate fires ~7×/yr in 2024–2026 vs ~18×/yr in 2022–23. Market structure change (low-ADX grinding) means weekly directional rarely gets a valid entry window."
-    },
-    {
-      "title": "FII Data Gap Q1-2023",
-      "desc": "FII historical data starts 2023-04-03 but FII gate activates 2023-01-01. Fixed via fillna→pass for NaN. No longer blocks Jan–Mar 2023 trades incorrectly."
-    },
-    {
-      "title": "No Live Execution",
-      "desc": "All results paper-only. Live slippage, margin, and execution risk not captured. Paper validation must run 18–24 months before any live capital."
+      "title": "No live execution",
+      "desc": "All results are backtest or paper. Live slippage, margin and execution risk are not captured."
     }
   ],
   "next": [
     {
-      "title": "Bear / Rate-Shock Strategy",
-      "desc": "Biggest gap: no validated strategy survives prolonged bear. DUAL_MOM performed best in 2022 (Sh=0.82) — needs proper IS/OOS validation and regime-conditional routing.",
-      "metric": "Priority 1 · critical gap"
+      "title": "Accumulate paper evidence",
+      "desc": "Keep paper trading VIX_GATE unlevered; judge only on data after the parameter lock.",
+      "metric": "Ongoing"
     },
     {
-      "title": "Straddle Paper Phase",
-      "desc": "Rate shock cleared. Gates passing. Begin paper straddle July 6, 2026. Track 18–24 months at 5% Kelly. Document all gate decisions and exit reasons.",
-      "metric": "Start: July 6, 2026"
+      "title": "Bear-market research",
+      "desc": "Look for a strategy that holds up in prolonged bear markets, with an out-of-sample split declared before testing.",
+      "metric": "Priority 1"
     },
     {
-      "title": "MOM20 OOS Validation",
-      "desc": "VIX+MOM20 Sharpe 1.08 IS (2015–2022). No explicit OOS test in 2023+. Needs formal walk-forward test before adding to live system.",
-      "metric": "Priority 2 · quick win"
-    },
-    {
-      "title": "ADX33 Sample Build-Up",
-      "desc": "Weekly directional ADX33 variant is promising (Sharpe 2.06 OOS) but n=39 trades. Need 2–3 years accumulation before statistical confidence. Paper trading now.",
-      "metric": "Monitor · 2–3 yr horizon"
-    },
-    {
-      "title": "Broker API Integration",
-      "desc": "Post paper validation: Zerodha/IBKR integration. 5% initial capital. Full size only after 12mo live track record. Not before Q4 2027.",
-      "metric": "Post paper · Q4 2027 earliest"
+      "title": "Validate before reporting",
+      "desc": "Every headline figure comes from engine result files via headline.json and is checked against them on every build.",
+      "metric": "Enforced by check.sh"
     }
   ],
   "roadmap": [
     {
       "num": "01",
-      "title": "Bear / Rate-Shock Strategy",
-      "desc": "No validated strategy survives prolonged bear. DUAL_MOM best candidate from 2022 data (Sh=0.82). Needs proper IS/OOS split and regime-routing integration.",
-      "effort": "critical gap · 1 month"
+      "title": "Paper evidence",
+      "desc": "Paper trade VIX_GATE unlevered with locked parameters.",
+      "effort": "ongoing"
     },
     {
       "num": "02",
-      "title": "Straddle Paper Phase",
-      "desc": "Rate shock cleared. All gates passing. Begin paper straddle July 6, 2026 at 5% Kelly. Track 18–24 months before live capital.",
-      "effort": "start July 6 · required gate"
+      "title": "Bear-market strategy",
+      "desc": "No validated strategy survives a prolonged bear market. Declare the out-of-sample split first.",
+      "effort": "critical gap"
     },
     {
       "num": "03",
-      "title": "MOM20 OOS Validation",
-      "desc": "VIX+MOM20 Sharpe 1.08 IS. No OOS test in 2023+. Walk-forward required before adding to live system.",
-      "effort": "2 weeks · quick win"
+      "title": "Cost model audit",
+      "desc": "Re-check cost and leverage handling in every backtest after the 20 Oct 2026 bug.",
+      "effort": "2 weeks"
     },
     {
       "num": "04",
-      "title": "ADX33 Signal Accumulation",
-      "desc": "Weekly directional ADX33 showing Sharpe 2.06 OOS but n=39 trades. Paper trade accumulation needed — 2–3 year horizon for statistical confidence.",
-      "effort": "ongoing · monitor quarterly"
+      "title": "Retire withdrawn figures",
+      "desc": "Keep superseded results out of every page; the content check enforces it.",
+      "effort": "done, enforced"
     },
     {
       "num": "05",
-      "title": "Live Execution",
-      "desc": "Broker API integration post paper validation. 5% initial capital. Full size only after 12mo live track record. Q4 2027 earliest.",
-      "effort": "post paper · Q4 2027"
+      "title": "Live execution",
+      "desc": "Only if paper results show an edge. Not planned before then.",
+      "effort": "conditional"
     }
   ]
 }

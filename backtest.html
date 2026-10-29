@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Backtest — CausalAlpha</title>
+<title>Backtest: CausalAlpha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -29,69 +29,57 @@
 #vrp-metrics-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 28px; }
 #vrp-metrics-row .bento-cell { background: var(--ground); }
 .scatter-dot { fill-opacity: 0.7; }
+.bt-verdict { font-family: var(--font-serif); font-size: clamp(22px, 2.4vw, 32px); font-weight: 400; line-height: 1.2; max-width: 34ch; margin-bottom: 10px; }
+.bt-evidence { font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted); line-height: 1.6; max-width: 80ch; }
+@media (max-width: 768px) { #vrp-metrics-row, .period-metrics { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
 <body>
 <script>renderNav('backtest')</script>
 
 <div class="container">
-  <div class="page-title">OOS Back<em>test</em></div>
+  <div class="page-title">Out-of-sample <em>backtest</em></div>
 </div>
 
 <div class="container" style="padding-bottom: 80px;">
   <div class="tab-nav">
     <button class="tab-btn active" data-tab="vixgate">VIX_GATE</button>
-    <button class="tab-btn" data-tab="weekly">Weekly Options</button>
-    <button class="tab-btn" data-tab="straddle">Straddle</button>
+    <button class="tab-btn" data-tab="weekly">Weekly options</button>
+    <button class="tab-btn" data-tab="straddle">Straddle (failed)</button>
     <button class="tab-btn" data-tab="vrp">Global VRP</button>
-    <button class="tab-btn" data-tab="portfolio">Portfolio</button>
+    <button class="tab-btn" data-tab="experimental">Experimental</button>
   </div>
 
-  <!-- ——— VIX_GATE ——— -->
+  <!-- --- VIX_GATE (headline, from headline.json) --- -->
   <div class="tab-panel active" data-tab="vixgate">
-    <div class="bento reveal" style="margin-bottom:32px;">
-      <div class="bento-row bento-row-4">
-        <div class="bento-cell"><span class="metric-label">Sharpe — OOS</span><span class="metric-value amber">1.26</span><span class="metric-sub">2× leverage</span></div>
-        <div class="bento-cell"><span class="metric-label">CAGR</span><span class="metric-value">12.4%</span><span class="metric-sub">2023–2026</span></div>
-        <div class="bento-cell"><span class="metric-label">Max Drawdown</span><span class="metric-value">−13.5%</span><span class="metric-sub">out-of-sample</span></div>
-        <div class="bento-cell"><span class="metric-label">Universe</span><span class="metric-value" style="font-size:32px;">SPY</span><span class="metric-sub">weekly rebalance · PPO</span></div>
-      </div>
-      <div class="bento-row bento-row-1">
-        <div class="bento-cell pad-lg">
-          <div class="chart-label">VIX_GATE vs Nifty50 — Normalized NAV from portfolio_combination.csv</div>
-          <div class="chart-wrap" style="height:280px;"><canvas id="vg-chart"></canvas></div>
-        </div>
-      </div>
+    <p class="section-label" id="bt-basis" data-headline="headline.json">Loading headline from headline.json</p>
+    <div class="bento reveal" style="margin-bottom:24px;" id="bt-headline">
+      <div class="bento-row bento-row-3" id="bt-cells"></div>
+    </div>
+    <p class="bt-verdict" id="bt-verdict"></p>
+    <p class="bt-evidence" id="bt-evidence"></p>
+    <div class="reveal" style="margin:32px 0;">
+      <div class="chart-label" id="bt-regime-summary">Every approach on the untouched sectors, after costs</div>
+      <div class="table-wrap" id="bt-regime-table"></div>
     </div>
     <div class="method-grid reveal">
-      <div class="method-card"><span class="method-num">Strategy</span><h3>Volatility Regime Filter</h3><p>VIX term structure gates the RL agent — only trades in low-uncertainty windows (VIX below adaptive threshold). Dramatically improves Sharpe by avoiding choppy regimes.</p></div>
-      <div class="method-card"><span class="method-num">Signal</span><h3>PPO on Causal Features</h3><p>Proximal Policy Optimization agent trained on causal feature set extracted from GDELT, cross-asset flows, and macro indicators. Features screened for causal rather than correlational relationships.</p></div>
-      <div class="method-card"><span class="method-num">Execution</span><h3>Weekly SPY Rebalance</h3><p>Position taken at weekly open based on prior-week signal. 2× leverage applied. Stop-loss and target exits managed by underlying agent policy.</p></div>
+      <div class="method-card"><span class="method-num">Universe</span><h3>NSE sector indices</h3><p>Built on five Nifty sector indices (Bank, IT, Energy, FMCG, Pharma); judged on three it never saw (Auto, Metal, Realty). Benchmark: buy and hold of the same sectors, on the same trading days.</p></div>
+      <div class="method-card"><span class="method-num">Rule</span><h3>Per-sector momentum, volatility gate</h3><p>Five equal slots, one per sector. A slot holds its sector only while that sector's 20-day momentum is positive and India VIX is at or below its 20-day median; otherwise the slot is in cash. Nothing is ranked. Decisions use data up to the previous close only.</p></div>
+      <div class="method-card"><span class="method-num">Costs and leverage</span><h3>Unlevered, 0.2% each way</h3><p>Headline figures are 1x. Reinforcement-learning agents trained for the same task found no edge and are not part of this rule.</p></div>
     </div>
   </div>
 
-  <!-- ——— WEEKLY OPTIONS ——— -->
+  <!-- --- WEEKLY OPTIONS (experimental) --- -->
   <div class="tab-panel" data-tab="weekly">
-    <div class="period-metrics reveal">
-      <div class="period-cell">
-        <span class="p-label">Full Period · 2019–2026</span>
-        <span class="p-sharpe">1.65</span>
-        <div class="p-stats">68 trades · 54.4% win · PSR=1.00</div>
-      </div>
-      <div class="period-cell">
-        <span class="p-label">OOS · 2022+</span>
-        <span class="p-sharpe">1.46</span>
-        <div class="p-stats">49 trades · 55.1% win · PSR=1.00 ✓</div>
-      </div>
-      <div class="period-cell">
-        <span class="p-label">Recent · 2023+</span>
-        <span class="p-sharpe">2.20</span>
-        <div class="p-stats">40 trades · 60.0% win · PSR=1.00 ✓</div>
-      </div>
+    <div class="callout warn reveal"><strong>Experimental: not validated</strong><p>Weekly directional option trades on the Nifty. The direction signal was tuned on the same history shown here and option time decay erodes the edge. Figures below are computed directly from the trade log.</p></div>
+    <div class="period-metrics reveal" id="weekly-stats">
+      <div class="period-cell"><span class="p-label">Trades</span><span class="p-sharpe" id="wk-n">n/a</span><div class="p-stats" id="wk-range"></div></div>
+      <div class="period-cell"><span class="p-label">Winning trades</span><span class="p-sharpe" id="wk-win">n/a</span><div class="p-stats">share of trades with positive P&amp;L</div></div>
+      <div class="period-cell"><span class="p-label">Average P&amp;L per trade</span><span class="p-sharpe" id="wk-avg">n/a</span><div class="p-stats">on option premium</div></div>
     </div>
 
     <div style="margin-bottom:28px;" class="reveal">
-      <div class="chart-label">Monthly PnL — Weekly Directional Options</div>
+      <div class="chart-label">Monthly P&amp;L, weekly directional options</div>
       <div class="chart-wrap" style="height:220px;"><canvas id="weekly-monthly-chart"></canvas></div>
     </div>
 
@@ -127,94 +115,62 @@
     </div>
   </div>
 
-  <!-- ——— STRADDLE ——— -->
+  <!-- --- STRADDLE (failed, frozen) --- -->
   <div class="tab-panel" data-tab="straddle">
     <div class="fail-header reveal">
-      <span class="badge fail">OOS Failed</span>
-      <div><h2>Nifty Straddle — Do NOT Deploy</h2><p>Overfitted to in-sample period. OOS Sharpe=0.09, CAGR=−1.3%. Paper trade 18–24 months minimum before any capital allocation.</p></div>
-    </div>
-    <div class="is-oos reveal" style="margin-bottom:28px;">
-      <div class="is-cell is-sample">
-        <span class="metric-label">In-Sample (2010–2021)</span>
-        <span class="metric-value green">2.06</span>
-        <span class="metric-sub">Sharpe · 20 trades · 6+ tuned parameters</span>
-        <div class="callout warn" style="margin-top:16px;"><strong>Warning</strong><p>6+ optimized parameters on 20 trades = near-certain overfitting. In-sample metrics are not predictive.</p></div>
-      </div>
-      <div class="is-cell oos-sample">
-        <span class="metric-label">Out-of-Sample (2016–2026)</span>
-        <span class="metric-value red">0.09</span>
-        <span class="metric-sub">Sharpe · CAGR −1.3% · MaxDD −46.8%</span>
-        <div class="callout fail" style="margin-top:16px;"><strong>OOS Verdict</strong><p>Strategy does not hold in live regime. CAGR −1.3% with −46.8% max drawdown. Frozen.</p></div>
-      </div>
+      <span class="badge fail">Failed, frozen</span>
+      <div><h2>Nifty monthly straddle: do not deploy</h2><p>Failed out-of-sample. Across a 576-combination parameter grid only 7.6% of settings had a positive Sharpe ratio (research log section 16.7), so the edge is not robust. Frozen; any paper position is a record only.</p></div>
     </div>
     <div class="reveal">
-      <div class="chart-label">Straddle Trade Log</div>
+      <div class="chart-label">Straddle trade log (backtest, for the record)</div>
       <div class="table-wrap">
         <table class="data-table" id="straddle-table">
           <thead><tr>
             <th data-sort="entry_date">Entry</th>
             <th data-sort="exit_date">Exit</th>
+            <th data-sort="exit_reason">Reason</th>
             <th data-sort="pnl_pct">PnL%</th>
           </tr></thead>
           <tbody id="straddle-tbody"></tbody>
         </table>
       </div>
     </div>
-    <div class="callout warn reveal" style="margin-top:32px;">
-      <strong>Next Steps</strong>
-      <p>Gate Monitor: first eligible paper trade July 2026 (VIX + rate conditions). Track paper performance for 18–24 months at 5% Kelly position sizing. Do not increase size until PSR > 0.95 on OOS paper data.</p>
-    </div>
   </div>
 
-  <!-- ——— GLOBAL VRP ——— -->
+  <!-- --- GLOBAL VRP --- -->
   <div class="tab-panel" data-tab="vrp">
+    <div class="callout warn reveal"><strong>Experimental: not validated</strong><p>Volatility-risk-premium trades on other markets, tested for comparison. Not part of the NSE strategy. Statistics are computed from each trade log.</p></div>
     <div class="market-btns reveal">
-      <button class="market-btn active" data-market="spx">SPX</button>
+      <button class="market-btn active" data-market="spx">S&amp;P 500</button>
       <button class="market-btn" data-market="tlt">TLT</button>
       <button class="market-btn" data-market="eurusd">EUR/USD</button>
       <button class="market-btn" data-market="gold">Gold</button>
       <button class="market-btn" data-market="oil">Oil</button>
     </div>
     <div id="vrp-metrics-row" class="reveal">
-      <div class="bento-cell"><span class="metric-label">Win Rate</span><span class="metric-value" id="vrp-winrate">—</span></div>
-      <div class="bento-cell"><span class="metric-label">CAGR</span><span class="metric-value" id="vrp-cagr">—</span></div>
-      <div class="bento-cell"><span class="metric-label">Sharpe</span><span class="metric-value amber" id="vrp-sharpe">—</span></div>
-      <div class="bento-cell"><span class="metric-label">Max DD</span><span class="metric-value" id="vrp-maxdd">—</span></div>
-      <div class="bento-cell"><span class="metric-label">Trades</span><span class="metric-value" id="vrp-trades">—</span></div>
+      <div class="bento-cell"><span class="metric-label">Win rate</span><span class="metric-value" id="vrp-winrate">n/a</span></div>
+      <div class="bento-cell"><span class="metric-label">Trades</span><span class="metric-value" id="vrp-trades">n/a</span></div>
+      <div class="bento-cell"><span class="metric-label">Avg P&amp;L / trade</span><span class="metric-value" id="vrp-avg">n/a</span></div>
+      <div class="bento-cell"><span class="metric-label">Worst trade</span><span class="metric-value" id="vrp-worst">n/a</span></div>
+      <div class="bento-cell"><span class="metric-label">Period</span><span class="metric-value" style="font-size:18px;" id="vrp-period">n/a</span></div>
     </div>
     <div class="reveal" style="margin-bottom:28px;">
-      <div class="chart-label">Cumulative PnL — <span id="vrp-market-label">SPX</span></div>
+      <div class="chart-label">Cumulative P&amp;L: <span id="vrp-market-label">S&amp;P 500</span></div>
       <div class="chart-wrap" style="height:260px;"><canvas id="vrp-chart"></canvas></div>
     </div>
   </div>
 
-  <!-- ——— PORTFOLIO ——— -->
-  <div class="tab-panel" data-tab="portfolio">
-    <div class="bento reveal" style="margin-bottom:32px;">
-      <div class="bento-row bento-row-4">
-        <div class="bento-cell"><span class="metric-label">Target CAGR</span><span class="metric-value amber">21.6%</span><span class="metric-sub">VG50+N20+I25 · ADX+MOM20 gate</span></div>
-        <div class="bento-cell"><span class="metric-label">Sharpe</span><span class="metric-value">1.18</span><span class="metric-sub">11-year backtest · PSR=1.000</span></div>
-        <div class="bento-cell"><span class="metric-label">Max Drawdown</span><span class="metric-value">−25.9%</span><span class="metric-sub">within −30% limit</span></div>
-        <div class="bento-cell"><span class="metric-label">₹10L → ₹82L</span><span class="metric-value" style="font-size:26px;">8.2×</span><span class="metric-sub">11 years (2015–2026)</span></div>
-      </div>
-      <div class="bento-row bento-row-1">
-        <div class="bento-cell pad-lg">
-          <div class="chart-label">All Strategies vs Nifty50 — Normalized NAV</div>
-          <div class="chart-wrap" style="height:300px;"><canvas id="portfolio-chart"></canvas></div>
-        </div>
-      </div>
+  <!-- --- EXPERIMENTAL: in-sample, not validated --- -->
+  <div class="tab-panel" data-tab="experimental">
+    <div class="callout fail reveal"><strong>Experimental: in-sample, not validated</strong>
+      <p>Earlier versions of this site led with a blended portfolio (VIX_GATE at 2x, Nifty, weekly calls and the straddle) using an ADX+MOM20 gate. Those figures are withdrawn: the blend is in-sample, its ADX threshold was grid-searched on the same data, it includes the failed straddle, and the 2x leg was charged costs as if it were 1x. The ADX+MOM20 gate is not in the research log as a validated result.</p>
     </div>
     <div class="bento reveal" style="margin-bottom:32px;">
       <div class="bento-row bento-row-1">
         <div class="bento-cell pad-lg">
-          <div class="chart-label" style="margin-bottom:16px;">Max-Alpha Config — 30% MaxDD Budget</div>
-          <div class="bento-row bento-row-4" style="border:none;padding:0;">
-            <div class="bento-cell" style="border:none;"><span class="metric-label">Optimal CAGR</span><span class="metric-value amber">22.3%</span><span class="metric-sub">3× VG40 N15 opt12 st10</span></div>
-            <div class="bento-cell" style="border:none;"><span class="metric-label">Sharpe</span><span class="metric-value">1.20</span><span class="metric-sub">Best risk-adjusted in grid</span></div>
-            <div class="bento-cell" style="border:none;"><span class="metric-label">Max Drawdown</span><span class="metric-value">−27.2%</span><span class="metric-sub">2.8pp buffer vs limit</span></div>
-            <div class="bento-cell" style="border:none;"><span class="metric-label">₹10L → ₹88L</span><span class="metric-value" style="font-size:26px;">8.8×</span><span class="metric-sub">648-config grid search</span></div>
-          </div>
-          <p style="font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6;">Grid search: 3 leverage levels × 6 VG weights × 3 Nifty weights × 4 options sizes × 3 straddle sizes = 648 configs. 156 feasible (MaxDD ≥ −30%). Key insight: 40% VG at 3× dominates 50% VG at 2× — ADX fires only 17% of days, smaller base weight earns risk-free more efficiently during 83% flat periods while matching same notional exposure when gate is on.</p>
+          <div class="chart-label">Legacy NAV file (portfolio_combination.csv, May 2026, before the cost correction)</div>
+          <div class="chart-wrap" style="height:300px;"><canvas id="portfolio-chart"></canvas></div>
+          <p class="bt-evidence" style="margin-top:12px;">Shown for transparency only. The straddle series in this file is broken (it duplicates the Nifty 50) and is not plotted.</p>
         </div>
       </div>
     </div>
@@ -224,43 +180,58 @@
 <script>
 initTabs();
 
-// ——— VIX_GATE CHART ———
+// --- HEADLINE (headline.json) ---
+loadHeadline().then(h => {
+  document.getElementById('bt-basis').textContent = h.strategy_name + ' vs ' + h.benchmark_name + ': ' + headlineBasis(h);
+  document.getElementById('bt-cells').innerHTML = headlineCells(h).map(c =>
+    '<div class="bento-cell"><span class="metric-label">' + esc(c.label) + '</span>' +
+    '<span class="metric-value ' + esc(c.cls) + '">' + esc(c.value) + '</span><span class="metric-sub">' + esc(c.sub) + '</span></div>').join('');
+  document.getElementById('bt-verdict').textContent = headlineVerdict(h);
+  document.getElementById('bt-evidence').textContent = headlineEvidence(h);
+  document.getElementById('bt-regime-summary').textContent = headlineRegimes(h);
+  document.getElementById('bt-regime-table').innerHTML = headlineRegimeTable(h);
+}).catch(err => {
+  headlineError(document.getElementById('bt-headline'), err);
+  document.getElementById('bt-basis').textContent = 'Headline unavailable';
+});
+
+// --- EXPERIMENTAL: legacy NAV (no straddle line: straddle_nav duplicates nifty_nav) ---
 parseCSV('data/results/portfolio_combination.csv').then(rows => {
-  const labels = rows.map(r => r.date).filter((_, i) => i % 4 === 0);
-  const vg = rows.map(r => parseFloat(r.vixgate_nav));
-  const nifty = rows.map(r => parseFloat(r.nifty_nav));
-  const labelsAll = rows.map(r => r.date);
-
-  buildLineChart('vg-chart', labelsAll.filter((_, i) => i % 4 === 0), [
-    lineDataset('VIX_GATE', vg.filter((_, i) => i % 4 === 0), '#B8760A', { width: 2 }),
-    lineDataset('Nifty50', nifty.filter((_, i) => i % 4 === 0), '#C8C4BC', { borderDash: [4, 4] })
+  const fi = arr => arr.filter((_, i) => i % 4 === 0);
+  const col = k => rows.map(r => parseFloat(r[k]));
+  buildLineChart('portfolio-chart', fi(rows.map(r => r.date)), [
+    lineDataset('VIX_GATE (legacy 2x)', fi(col('vixgate_nav')), '#B8760A', { width: 2 }),
+    lineDataset('Nifty50', fi(col('nifty_nav')), '#6B6760', { borderDash: [4, 4] }),
+    lineDataset('Options', fi(col('options_nav')), '#1A5296'),
+    lineDataset('Blend 70/20/10', fi(col('combo_70_20_10')), '#27622A', { width: 2 }),
   ]);
+}).catch(err => {
+  document.getElementById('portfolio-chart').insertAdjacentHTML('afterend',
+    '<p class="callout fail" role="alert">Could not load portfolio_combination.csv (' + esc(err) + ')</p>');
+});
 
-  // Portfolio chart
-  const opt = rows.map(r => parseFloat(r.options_nav));
-  const strad = rows.map(r => parseFloat(r.straddle_nav));
-  const combo = rows.map(r => parseFloat(r.combo_70_20_10 || r['combo_70_20_10'] || 1));
-  const sl = labelsAll.filter((_, i) => i % 4 === 0);
-  const fi = (arr) => arr.filter((_, i) => i % 4 === 0);
-
-  buildLineChart('portfolio-chart', sl, [
-    lineDataset('VIX_GATE', fi(vg), '#B8760A', { width: 2 }),
-    lineDataset('Nifty50', fi(nifty), '#C8C4BC', { borderDash: [4, 4] }),
-    lineDataset('Options', fi(opt), '#1A5296'),
-    lineDataset('Straddle', fi(strad), '#6B6760'),
-    lineDataset('Combo 70/20/10', fi(combo), '#27622A', { width: 2.5 }),
-  ]);
-}).catch(() => {});
-
-// ——— WEEKLY OPTIONS ———
+// --- WEEKLY OPTIONS ---
 let allTrades = [];
 parseCSV('data/results/weekly_directional_trades.csv').then(rows => {
   allTrades = rows;
   renderWeeklyTable(rows);
   buildMonthlyChart(rows);
+  renderWeeklyStats(rows);
   document.getElementById('trade-count').textContent = rows.length + ' trades';
   initSortableTable('weekly-table');
-}).catch(() => {});
+}).catch(err => {
+  document.getElementById('weekly-tbody').innerHTML = '<tr><td colspan="10" role="alert">Could not load trade log (' + esc(err) + ')</td></tr>';
+});
+
+function renderWeeklyStats(rows) {
+  const pnl = rows.map(r => parseFloat(r.pnl_pct)).filter(isFinite);
+  if (!pnl.length) return;
+  const dates = rows.map(r => r.entry_date).sort();
+  document.getElementById('wk-n').textContent = pnl.length;
+  document.getElementById('wk-range').textContent = dates[0].slice(0, 4) + ' to ' + dates[dates.length - 1].slice(0, 4);
+  document.getElementById('wk-win').textContent = (100 * pnl.filter(v => v > 0).length / pnl.length).toFixed(1) + '%';
+  document.getElementById('wk-avg').textContent = fmtSigned(100 * pnl.reduce((a, b) => a + b, 0) / pnl.length, 1, '%');
+}
 
 function renderWeeklyTable(rows) {
   const tbody = document.getElementById('weekly-tbody');
@@ -269,16 +240,16 @@ function renderWeeklyTable(rows) {
     const cls = pnl >= 0 ? 'pos' : 'neg';
     const dirCls = r.direction === 'CALL' ? 'call' : 'put';
     return `<tr>
-      <td data-col="entry_date" data-val="${r.entry_date}">${fmtDate(r.entry_date)}</td>
-      <td data-col="expiry_date" data-val="${r.expiry_date}">${fmtDate(r.expiry_date)}</td>
-      <td data-col="direction" data-val="${r.direction}" class="${dirCls}">${r.direction}</td>
-      <td data-col="strike" data-val="${r.strike}">${parseFloat(r.strike).toFixed(0)}</td>
-      <td data-col="entry_premium" data-val="${r.entry_premium}">${parseFloat(r.entry_premium).toFixed(1)}</td>
-      <td data-col="exit_premium" data-val="${r.exit_premium}">${parseFloat(r.exit_premium).toFixed(1)}</td>
-      <td data-col="exit_reason" data-val="${r.exit_reason}">${r.exit_reason}</td>
-      <td data-col="pnl_pct" data-val="${pnl}" class="${cls}">${(pnl * 100).toFixed(1)}%</td>
-      <td data-col="bull_score" data-val="${r.bull_score}">${r.bull_score}</td>
-      <td data-col="bear_score" data-val="${r.bear_score}">${r.bear_score}</td>
+      <td data-col="entry_date" data-val="${esc(r.entry_date)}">${esc(fmtDate(r.entry_date))}</td>
+      <td data-col="expiry_date" data-val="${esc(r.expiry_date)}">${esc(fmtDate(r.expiry_date))}</td>
+      <td data-col="direction" data-val="${esc(r.direction)}" class="${dirCls}">${esc(r.direction)}</td>
+      <td data-col="strike" data-val="${esc(r.strike)}">${parseFloat(r.strike).toFixed(0)}</td>
+      <td data-col="entry_premium" data-val="${esc(r.entry_premium)}">${parseFloat(r.entry_premium).toFixed(1)}</td>
+      <td data-col="exit_premium" data-val="${esc(r.exit_premium)}">${parseFloat(r.exit_premium).toFixed(1)}</td>
+      <td data-col="exit_reason" data-val="${esc(r.exit_reason)}">${esc(r.exit_reason)}</td>
+      <td data-col="pnl_pct" data-val="${esc(pnl)}" class="${cls}">${fmtSigned(pnl * 100, 1, '%')}</td>
+      <td data-col="bull_score" data-val="${esc(r.bull_score)}">${esc(r.bull_score)}</td>
+      <td data-col="bear_score" data-val="${esc(r.bear_score)}">${esc(r.bear_score)}</td>
     </tr>`;
   }).join('');
 }
@@ -313,40 +284,35 @@ function buildMonthlyChart(rows) {
   });
 });
 
-// ——— STRADDLE TABLE ———
-parseCSV('data/results/straddle_backtest.csv').then(rows => {
+// --- STRADDLE TABLE (straddle_backtest_monthly.csv, deployed by sync_deploy.sh) ---
+parseCSV('data/results/straddle_backtest_monthly.csv').then(rows => {
   const tbody = document.getElementById('straddle-tbody');
-  tbody.innerHTML = rows.slice(0, 40).map(r => {
+  tbody.innerHTML = rows.map(r => {
     const pnl = parseFloat(r.pnl_pct);
     return `<tr>
-      <td data-col="entry_date" data-val="${r.entry_date}">${fmtDate(r.entry_date)}</td>
-      <td data-col="exit_date" data-val="${r.exit_date}">${fmtDate(r.exit_date)}</td>
-      <td data-col="pnl_pct" data-val="${pnl}" class="${pnl >= 0 ? 'pos' : 'neg'}">${(pnl * 100).toFixed(2)}%</td>
+      <td data-col="entry_date" data-val="${esc(r.entry_date)}">${esc(fmtDate(r.entry_date))}</td>
+      <td data-col="exit_date" data-val="${esc(r.exit_date)}">${esc(fmtDate(r.exit_date))}</td>
+      <td data-col="exit_reason" data-val="${esc(r.exit_reason)}">${esc(r.exit_reason)}</td>
+      <td data-col="pnl_pct" data-val="${esc(pnl)}" class="${pnl >= 0 ? 'pos' : 'neg'}">${fmtSigned(pnl * 100, 2, '%')}</td>
     </tr>`;
   }).join('');
   initSortableTable('straddle-table');
-}).catch(() => {});
+}).catch(err => {
+  document.getElementById('straddle-tbody').innerHTML = '<tr><td colspan="4" role="alert">Could not load straddle log (' + esc(err) + ')</td></tr>';
+});
 
-// ——— GLOBAL VRP ———
-const VRP_STATS = {
-  spx:    { winrate: '75%', cagr: '10.0%', sharpe: '1.58', maxdd: '−8.7%',  trades: 89 },
-  tlt:    { winrate: '69%', cagr: '5.0%',  sharpe: '0.83', maxdd: '−6.2%',  trades: 102 },
-  eurusd: { winrate: '64%', cagr: '1.7%',  sharpe: '0.51', maxdd: '−8.0%',  trades: 87 },
-  gold:   { winrate: '57%', cagr: '0.9%',  sharpe: '0.16', maxdd: '−12.3%', trades: 70 },
-  oil:    { winrate: '59%', cagr: '1.3%',  sharpe: '0.16', maxdd: '−31.1%', trades: 81 },
-};
-
+// --- GLOBAL VRP (stats computed from each trade log) ---
+const VRP_LABELS = { spx: 'S&P 500', tlt: 'TLT', eurusd: 'EUR/USD', gold: 'Gold', oil: 'Oil' };
 let vrpChart = null;
 function loadVRP(market) {
-  const s = VRP_STATS[market];
-  document.getElementById('vrp-winrate').textContent = s.winrate;
-  document.getElementById('vrp-cagr').textContent = s.cagr;
-  document.getElementById('vrp-sharpe').textContent = s.sharpe;
-  document.getElementById('vrp-maxdd').textContent = s.maxdd;
-  document.getElementById('vrp-trades').textContent = s.trades;
-  document.getElementById('vrp-market-label').textContent = market.toUpperCase();
-
+  document.getElementById('vrp-market-label').textContent = VRP_LABELS[market];
   parseCSV(`data/results/global_vrp_${market}.csv`).then(rows => {
+    const pnl = rows.map(r => parseFloat(r.pnl_pct)).filter(isFinite);
+    document.getElementById('vrp-trades').textContent = pnl.length;
+    document.getElementById('vrp-winrate').textContent = pnl.length ? (100 * pnl.filter(v => v > 0).length / pnl.length).toFixed(0) + '%' : 'n/a';
+    document.getElementById('vrp-avg').textContent = pnl.length ? fmtSigned(100 * pnl.reduce((a, b) => a + b, 0) / pnl.length, 2, '%') : 'n/a';
+    document.getElementById('vrp-worst').textContent = pnl.length ? fmtSigned(100 * Math.min(...pnl), 1, '%') : 'n/a';
+    document.getElementById('vrp-period').textContent = rows.length ? rows[0].entry_date.slice(0, 4) + ' to ' + rows[rows.length - 1].entry_date.slice(0, 4) : 'n/a';
     let cum = 0;
     const labels = [], values = [];
     rows.forEach(r => {
@@ -355,12 +321,14 @@ function loadVRP(market) {
       values.push(+(cum * 100).toFixed(2));
     });
     if (vrpChart) vrpChart.destroy();
-    const ctx = document.getElementById('vrp-chart');
-    if (ctx) vrpChart = buildLineChart('vrp-chart',
+    vrpChart = buildLineChart('vrp-chart',
       labels.filter((_, i) => i % 3 === 0),
       [lineDataset('Cumulative PnL%', values.filter((_, i) => i % 3 === 0), '#B8760A', { fill: true, width: 2 })]
     );
-  }).catch(() => {});
+  }).catch(err => {
+    document.getElementById('vrp-trades').textContent = 'n/a';
+    document.getElementById('vrp-market-label').textContent = VRP_LABELS[market] + ' (could not load: ' + err + ')';
+  });
 }
 
 document.querySelectorAll('.market-btn').forEach(btn => {

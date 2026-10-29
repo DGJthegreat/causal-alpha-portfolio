@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Updates — CausalAlpha</title>
+<title>Updates: CausalAlpha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -18,191 +18,128 @@
 
 <section class="section-sm">
   <div class="container">
-    <p class="section-label">All Updates — Latest First</p>
+    <p class="section-label">All updates, latest first</p>
     <div class="news-feed reveal" id="news-feed"></div>
   </div>
 </section>
 
 <script>
+// Superseded figures from earlier entries are not repeated here: the corrected
+// headline is the only performance claim, and it is loaded from headline.json.
 const MILESTONES = [
   {
-    date: '2026-06-03', type: 'MILESTONE', badge: 'active',
-    title: 'Bear-Side Builds Live — PUT Leg + IVIX Slope Gate + Nifty Regime Research',
-    summary: 'Three bear-exploitation builds completed. (A) PUT weekly leg enabled: bear_score≥5 → ATM PUT trade, VIX<25 guard. (B) Nifty20 regime gate backtested: MaxDD −25.9%→−25.3%, CAGR unchanged. (C) IVIX slope 8th straddle gate: +15.1pp backwardation today.',
-    body: `<p>Full bear-side research pipeline completed (6-phase deep research, 18 sources). Three builds shipped to production.</p>
-    <h4>Build A — PUT Weekly Leg</h4>
-    <p>Symmetric counterpart to the existing CALL leg. <code>bear_score ≥ 5 AND bear_score > bull_score AND VIX &lt; 25</code> → enter ATM PUT Monday, exit Tuesday. Today: bear=6/7 (strong bear signal). ADX=32.3 just below gate — no trade today, but directional puts will fire on the next qualifying Monday.</p>
-    <h4>Build B — Nifty20 Regime Gate (Backtest)</h4>
-    <table><thead><tr><th>Config</th><th>CAGR</th><th>Sharpe</th><th>MaxDD</th><th>₹10L→</th></tr></thead>
-    <tbody>
-      <tr><td>ADX+MOM20 (current)</td><td>+21.6%</td><td>1.18</td><td>−25.9%</td><td>₹82L</td></tr>
-      <tr><td><strong>ADX+MOM20 + Nifty gate</strong></td><td><strong>+21.4%</strong></td><td><strong>1.18</strong></td><td><strong>−25.3%</strong></td><td><strong>₹81L</strong></td></tr>
-    </tbody></table>
-    <p>Halving Nifty exposure 20%→10% during gate-off days: −0.2pp CAGR cost, −0.6pp MaxDD improvement. Marginal benefit at current 20% Nifty weight — deferred for live implementation.</p>
-    <h4>Build C — IVIX Slope 8th Straddle Gate</h4>
-    <p>Proxy for VIX term structure backwardation (Johnson 2017, JFQA). Gate passes when VIX &gt; short-term RV AND short-term RV not accelerating past long-term RV. Current: ivix_slope = +15.1pp (PASS). Total straddle gates now: 8 (vix, fii, vrp, ivix_slope, atr, rate, mom_bleed, calendar).</p>
-    <p><strong>Research verdict:</strong> India TC stack 10× US makes pairs/SSF short-selling unviable at monthly frequency. Directional PUT spreads + regime gates are the correct bear exploitation path for this system.</p>`
+    date: '2026-10-28', type: 'RESULT', badge: 'fail', id: 'prereg',
+    title: 'Pre-registered test on untouched sectors: no edge after costs',
+    summary: 'The rules and the test were frozen and committed before three NSE sectors the rules had never seen were downloaded. On those sectors, after costs, no timing rule, causal-discovery filter or reinforcement-learning agent beat buy-and-hold.',
+    body: `<p>The previous corrected figures were measured from 2023 on the same five sectors the rule was built on, and that window had been used to choose the rule, so they were not a fair test. The new test uses Nifty Auto, Metal and Realty from 2021, with one information set, next-close execution, NSE costs and cash earning the repo rate for every approach.</p>
+    <div id="news-headline"><p>Loading figures</p></div>
+    <p>VIX_GATE's shallower drawdowns came from holding less of the time: a fixed index mix with the same exposure had a smaller worst fall. Every number is rebuilt by one command from frozen data.</p>`
   },
   {
-    date: '2026-06-02', type: 'RESEARCH', badge: 'active',
-    title: 'Max-Alpha Config Found — 30% MaxDD Budget',
-    summary: '648-config grid search under 30% MaxDD constraint. Optimal: 3× sector leverage, 40% VG, 15% Nifty, 12% opt/trade, 10% straddle → CAGR +22.3%, Sharpe 1.20, MaxDD −27.2%, ₹10L → ₹88L.',
-    body: `<p>Grid search across 648 configurations (leverage × allocation × options sizing) with MaxDD ≤ −30% constraint. 156 feasible configs found.</p>
-    <table><thead><tr><th>Config</th><th>CAGR</th><th>Sharpe</th><th>MaxDD</th><th>₹10L→</th></tr></thead>
-    <tbody>
-      <tr><td><strong>3× VG40 N15 opt12 st10</strong></td><td>+22.3%</td><td><strong>1.20</strong></td><td>−27.2%</td><td><strong>₹88L</strong></td></tr>
-      <tr><td>2.5× VG40 N15 opt15 st10</td><td>+24.2%</td><td>1.10</td><td>−29.8%</td><td>₹103L</td></tr>
-      <tr><td>Current (2× VG50 N20 opt12 st5)</td><td>+21.6%</td><td>1.18</td><td>−25.9%</td><td>₹82L</td></tr>
-    </tbody></table>
-    <p><strong>Key insight:</strong> Reducing VG allocation 50%→40% and raising leverage 2×→3× dominates. ADX gate fires only 17% of days — smaller base weight earns risk-free more efficiently during the 83% flat periods, while matching the same notional sector exposure when the gate is on.</p>
-    <p>Best balanced (max Sharpe with buffer): 3× VG40% Nifty15% opt12% st10%. MaxDD has 2.8pp safety margin vs the 30% constraint.</p>`
+    date: '2026-10-20', type: 'CORRECTION', badge: 'fail', id: 'correction',
+    title: 'Correction: two sets of figures withdrawn, headline restated',
+    summary: 'Two separate problems, two separate withdrawals. The earlier VIX_GATE headline (2x leverage) was overstated by a leverage-cost bug. The blended ADX+MOM20 portfolio figures were never a valid test: in-sample, grid-searched, and including the failed straddle.',
+    body: `<p><strong>1. VIX_GATE headline, leverage-cost bug.</strong> The earlier VIX_GATE Sharpe and annual return were run at 2x leverage while trading costs were charged as if the position were 1x. The bug is fixed in every backtester and covered by tests. A second bug forced the strategy into cash for the first 20 trading days of every test window while its indicators warmed up; that is fixed too. The figures recomputed then were later withdrawn as well; see the 28 Oct entry.</p>
+    <p><strong>2. Blended ADX+MOM20 portfolio, in-sample.</strong> This blend was once shown as the headline. Its figures are withdrawn for a different reason: they were in-sample, the ADX threshold and weights were grid-searched on the same data used to score them, and the blend included the failed straddle. It was never validated and now sits under Experimental on the Backtest page.</p>`
   },
   {
-    date: '2026-06-02', type: 'RESEARCH', badge: 'active',
-    title: 'Anti-Diffusion Research Complete — 8 Signals Genuinely Independent',
-    summary: 'PCA audit of 8 composite signals: 7 PCs needed for 90% variance — signals are truly independent. Diffusion problem is tier sparsity, not redundancy. 4 new orthogonal signals qualify (PCR + SPX-VIX). Variable leverage closed.',
-    body: `<p>Ran full PCA audit on the 8-signal composite (vix_z_pos, adx_trend, volume_low, rate_ok, mom20, dxy_fall, rs_5d_pos, fii_pos).</p>
-    <p><strong>PCA result (surprising):</strong> 7 PCs required for 90% variance — signals are genuinely independent, not redundant. The diffusion problem was tier sparsity, not correlation.</p>
-    <p><strong>Per-level IC test:</strong> Only 2/8 consecutive score tiers separable with 8 signals. Variable leverage needs ≥3 separable pairs to be viable.</p>
-    <p><strong>4 new qualifying signals</strong> tested (PCR OI + SPX VIX data):<br>
-    pcr_hi (IC=+0.029, p=0.13), spx_vix_low (IC=+0.039, p=0.04), vix_diverge_z (IC=+0.045, p=0.09), vix_spread_pos (IC=+0.054, p=0.004). All pass: factor loading &lt;0.40, marginal IC &gt;0.003.</p>
-    <p><strong>12-signal expanded composite:</strong> 3 separable pairs (meets threshold), but PCR/SPX-VIX signals fire too frequently (score≥5 rises 56%→81%), avg leverage jumps to 2.27×, MaxDD explodes to −70.7%.</p>
-    <p><strong>Verdict:</strong> Binary ADX+MOM20 (PSR=1.000, Sh=1.06, MaxDD=−14%) beats every variable leverage config. Variable leverage research closed.</p>`
+    date: '2026-06-03', type: 'RESEARCH', badge: 'warn',
+    title: 'Bear-side experiments: PUT leg, IVIX slope gate',
+    summary: 'Experimental, not validated. A weekly PUT leg and an extra straddle gate were added to the paper trader for research. Neither is part of the headline strategy.',
+    body: `<p>PUT leg: <code>bear_score ≥ 5 AND bear_score &gt; bull_score AND VIX &lt; 25</code> enters an ATM PUT on Monday and exits Tuesday. Paper only.</p>
+    <p>IVIX slope gate: a proxy for VIX term-structure backwardation (Johnson 2017, JFQA), added as a further straddle gate. The straddle itself remains frozen.</p>
+    <p>Research verdict: India's transaction-cost stack makes pairs and single-stock-future shorting unviable at monthly frequency.</p>`
   },
   {
-    date: '2026-06-02', type: 'MILESTONE', badge: 'active',
-    title: 'Gate Upgrade — ADX+MOM20 Replaces VIX20+MOM20',
-    summary: 'Production sector rotation gate upgraded. ADX+MOM20: Sharpe 1.06 vs VIX20 Sharpe 0.23. Fire rate drops 37%→17%. Hidden bug fixed: gate-off now earns risk-free (0×), was holding sector at 1× leverage.',
-    body: `<p>The sector rotation gate was upgraded from VIX ≤ 20-day median to cross-sector average ADX > 0.4 (normalised), confirmed by MOM20 > 0.</p>
-    <table><thead><tr><th>Gate</th><th>Sharpe</th><th>OOS CAGR</th><th>MaxDD</th><th>PSR</th><th>Fire rate</th></tr></thead>
-    <tbody>
-      <tr><td>VIX20+MOM20 (old)</td><td>0.23</td><td>+7.4%</td><td>−28.8%</td><td>0.863</td><td>37%</td></tr>
-      <tr><td><strong>ADX+MOM20 (new)</strong></td><td><strong>1.06</strong></td><td><strong>+14.6%</strong></td><td><strong>−14.0%</strong></td><td><strong>1.000</strong></td><td><strong>17%</strong></td></tr>
-    </tbody></table>
-    <p><strong>Hidden bug fixed:</strong> When VIX gate failed, the paper trader kept the sector position at 1× leverage. Backtest model went flat (0×). Now correctly earns risk-free rate when gate is off — matching the backtest assumptions.</p>
-    <p><strong>Straddle gates also synced:</strong> auto_paper_trader.py had 5 gates; gate_monitor.py had 7. Added VRP gate (IV > HAR realized vol) and mom_bleed gate (|60d Nifty return| ≤ 30%). Both match gate_monitor.py logic exactly. Current VRP = 15.12pp (juicy for July straddle).</p>
-    <p><strong>Current ADX status:</strong> avg ADX = 0.320 &lt; 0.4 → gate FAIL. Sector rotation flat, earning risk-free. Correctly identifies current choppy regime.</p>`
-  },
-  {
-    date: '2026-06-01', type: 'TRADE', badge: 'active',
-    title: 'Straddle LIVE — June Entry (946 pts)',
-    summary: 'First live paper straddle entered June 1, 2026. Spot 23,560. ATM straddle premium 946 pts (4.01% of spot). Expiry June 25. All gates passed at entry.',
-    body: `<p>The monthly ATM short straddle was entered on 2026-06-01. This is the first paper straddle trade.</p>
-    <table><thead><tr><th>Parameter</th><th>Value</th></tr></thead>
-    <tbody>
-      <tr><td>Entry date</td><td>2026-06-01</td></tr>
-      <tr><td>Entry spot (Nifty)</td><td>23,560</td></tr>
-      <tr><td>Premium (ATM straddle)</td><td>946 pts (4.01%)</td></tr>
-      <tr><td>Expiry</td><td>2026-06-25 (last Thursday)</td></tr>
-      <tr><td>Days to expiry at entry</td><td>24</td></tr>
-      <tr><td>P&amp;L to date</td><td>Tracking via paper_state.json</td></tr>
-    </tbody></table>
-    <p><strong>Gates at entry (all 7 passed):</strong> vix_ok ✓ · fii_ok ✓ · vrp_ok ✓ · atr_ok ✓ · rate_ok ✓ · mom_bleed_ok ✓ · calendar_ok ✓</p>
-    <p><strong>Note:</strong> Calendar gate was added retroactively to the paper trader (bug fix — was only 5 gates). The entry would still be valid under the corrected 7-gate check. RBI June 5 meeting is 4 days after entry; ±7-day calendar window blocks entries, but June 1 is at exactly 4 days which was the old bug boundary. The position is live and tracking.</p>
-    <p>Straddle sub-account NAV: 100.00 (P&amp;L realised at expiry). Stop: 2× initial premium value.</p>`
-  },
-  {
-    date: '2026-05-30', type: 'MILESTONE', badge: 'active',
-    title: 'Paper Trader Deployed',
-    summary: 'Automated paper trading system live. Three sub-accounts (options, sector rotation, straddle) tracking independently with gate monitor running daily.',
-    body: `<p>The auto paper trader was deployed on 2026-05-30. It monitors three independent strategies:</p>
-    <p><strong>Sector Rotation (96.833 NAV):</strong> Currently holding CNX Energy at 2× leverage. Entry at 40,814.60 on 2026-05-30. Regime: R3_RATE_SHOCK, CNX Energy approved.</p>
-    <p><strong>Options (100.000 NAV):</strong> Idle. ADX signal below threshold. Gate will trigger when 5-signal combo fires.</p>
-    <p><strong>Straddle (100.000 NAV):</strong> Blocked for June 2026. First eligible paper trade: July 2026. VIX elevated + RBI June 5 meeting block.</p>`
-  },
-  {
-    date: '2026-05-29', type: 'SIGNAL', badge: 'nogo',
-    title: 'Straddle OOS: FAILED — Frozen',
-    summary: 'Nifty straddle strategy failed out-of-sample validation. OOS Sharpe 0.09, CAGR −1.3%, MaxDD −46.8%. Strategy frozen. Paper trade only at 5% Kelly minimum 18 months.',
-    body: `<p>OOS backtest 2016–2026 confirmed the straddle strategy does not hold in live conditions. In-sample Sharpe of 2.06 was achieved with 6+ tuned parameters on only 20 trades — classic overfitting.</p>
-    <table><thead><tr><th>Metric</th><th>In-Sample</th><th>OOS</th></tr></thead>
-    <tbody>
-      <tr><td>Sharpe</td><td>2.06 ✓</td><td>0.09 ✗</td></tr>
-      <tr><td>CAGR</td><td>~40%</td><td>−1.3%</td></tr>
-      <tr><td>Max DD</td><td>−12%</td><td>−46.8%</td></tr>
-      <tr><td>Trades</td><td>20</td><td>—</td></tr>
-    </tbody></table>
-    <p>Decision: freeze. Paper trade 18–24 months before any live capital. Do not increase size until PSR > 0.95 on paper data.</p>`
-  },
-  {
-    date: '2026-05-28', type: 'SIGNAL', badge: 'warn',
-    title: 'Regime Signal: R3_RATE_SHOCK — June NO-GO',
-    summary: 'Regime detector triggered R3_RATE_SHOCK with 72.9% confidence. June 2026 declared NO-GO. VIX elevated, RBI June 5 meeting adds additional uncertainty.',
-    body: `<p>Regime classification: R3_RATE_SHOCK (confidence: 72.9%). This regime suppresses most trading signals.</p>
-    <p><strong>Straddle calendar:</strong> June 2026 — BLOCKED. July 2026 — first eligible candidate. August 2026 — BLOCKED (RBI).</p>
-    <p><strong>Sector weights:</strong> CNX Energy approved for investment at 2×. Other sectors: HOLD pending regime improvement.</p>
-    <p><strong>Options gate:</strong> IDLE. ADX < 33 indicates choppy price action. Signal will fire when trend strengthens.</p>`
-  },
-  {
-    date: '2026-05-27', type: 'MILESTONE', badge: 'active',
-    title: 'Weekly Options OOS v3: Sharpe 1.65 Confirmed',
-    summary: 'Weekly directional options strategy v3 validated. Full period 2019–2026: Sharpe 1.65, 68 trades, 54.4% win. OOS 2022+ Sharpe 1.46. Recent 2023+ Sharpe 2.20.',
-    body: `<p>Final validation of the weekly options strategy after signal combination research. Best signal combo: spx_prior_week_bull + gap_up + above_ema20 + us10y_falling.</p>
-    <table><thead><tr><th>Period</th><th>Trades</th><th>Win%</th><th>Sharpe</th><th>PSR</th></tr></thead>
-    <tbody>
-      <tr><td>Full 2019–2026</td><td>68</td><td>54.4%</td><td>1.65</td><td>1.00 ✓</td></tr>
-      <tr><td>OOS 2022+</td><td>49</td><td>55.1%</td><td>1.46</td><td>1.00 ✓</td></tr>
-      <tr><td>Recent 2023+</td><td>40</td><td>60.0%</td><td>2.20</td><td>1.00 ✓</td></tr>
-    </tbody></table>
-    <p>T+1 (Tuesday close) confirmed as optimal exit structure. T+3 tested and discarded — mid-week reversion reduces returns.</p>`
+    date: '2026-06-02', type: 'RESEARCH', badge: 'warn',
+    title: 'ADX+MOM20 gate and blended-portfolio grid search (withdrawn)',
+    summary: 'Experimental, in-sample, not validated. The ADX threshold and portfolio weights were grid-searched on the same data used to score them, and the blend included the failed straddle. Figures withdrawn.',
+    body: `<p>A PCA audit found the 8 composite signals genuinely independent (7 components for 90% of variance). Variable leverage made drawdowns far worse and was closed.</p>
+    <p>A bug was fixed in the paper trader: when the gate was off it held the sector at 1x instead of going to cash as the backtest assumed.</p>`
   },
   {
     date: '2026-06-01', type: 'FINDING', badge: 'research',
-    title: 'Regime Audit: 7 of 9 Components Overfit',
-    summary: 'Full regime audit completed. 368 signals tested — 3% pass significance. VIX_GATE is the only strategy surviving the full IS→OOS regime audit. Causal filters hurt, not help.',
-    body: `<p>Comprehensive regime audit across 6 market environments (2015–2026). Key findings:</p>
-    <p><strong>Overfit components:</strong> rate_shock_gate (tuned to 2022 peak only), momentum_bleed_gate (2017-specific), weekly_dir S5 (IS 1.58 → OOS −0.91), sector exclusions (baseline beat rotation in 2022), 576-param grid (CV=126%).</p>
-    <p><strong>Causal signals:</strong> VIX+causal Sharpe −0.52 vs VIX+MOM20 +1.08. 368 signals tested, 11 pass p&lt;0.05 — 3% hit rate consistent with multiple-comparison noise. Causal relationships confirmed (SPY Granger-causes all sectors, p&lt;1e−20) but already embedded in VIX.</p>
-    <p><strong>New rate-shock gate:</strong> replaced yield-level rule (4.2%, 2022-only) with sector-RS gate — IT 20d underperformance + rate acceleration. Fires 46% of 2022, 0% of 2023, 6.5% of 2024.</p>
-    <p><strong>Gap identified:</strong> no validated strategy for prolonged bear regime. Best in 2022 rate shock: DUAL_MOM at Sharpe 0.82. In china crash 2015: all strategies collapse (best −0.95). Active research priority.</p>`
+    title: 'Regime audit: most components overfit',
+    summary: 'Audit across 6 market regimes: 7 of 9 strategy components were overfit to one period. 368 signals tested, 3% pass significance, about what chance predicts. Causal filters hurt.',
+    body: `<p><strong>Overfit components:</strong> rate_shock_gate (tuned to the 2022 peak), momentum_bleed_gate (2017-specific), a weekly directional signal set (failed out-of-sample), sector exclusions, and the 576-combination straddle grid.</p>
+    <p><strong>Causal signals:</strong> adding causal filters to the VIX gate lowered the Sharpe ratio. The relationships are real (the US S&amp;P 500 Granger-causes Indian sector returns) but already embedded in the VIX signal.</p>
+    <p><strong>Gap:</strong> no validated strategy for a prolonged bear market.</p>`
   },
   {
-    date: '2026-05-20', type: 'MILESTONE', badge: 'active',
-    title: 'VIX_GATE Validated: Sharpe 1.26 OOS',
-    summary: 'VIX_GATE strategy confirmed as core holding. Sharpe 1.26 out-of-sample at 2× leverage, 2023–2026. CAGR 12.4%, MaxDD −13.5%. Target portfolio allocation: 50%.',
-    body: `<p>VIX_GATE is the flagship strategy. Volatility regime filter applied to PPO agent trained on causal features.</p>
-    <p>Key metrics confirmed OOS (2023–2026): Sharpe 1.26 · CAGR 12.4% · MaxDD −13.5% · 2× leverage · weekly SPY rebalance.</p>
-    <p>Target allocation in combined portfolio: 50%. Combined portfolio CAGR target: 20.2% (backtest 2015–2026).</p>`
+    date: '2026-05-30', type: 'MILESTONE', badge: 'research',
+    title: 'Paper trader deployed',
+    summary: 'Automated paper trading started on 2026-05-30 with separate sub-accounts for NSE sector rotation, weekly options and the (frozen) straddle. Paper only; no real capital.',
+    body: `<p>Current paper positions and NAV are on the Live page, read from paper_state.json.</p>`
+  },
+  {
+    date: '2026-05-29', type: 'SIGNAL', badge: 'fail',
+    title: 'Straddle: failed out-of-sample, frozen',
+    summary: 'The Nifty monthly straddle failed out-of-sample. Across its 576-combination parameter grid only 7.6% of settings had a positive Sharpe ratio (research log section 16.7). Frozen.',
+    body: `<p>The in-sample result came from many tuned parameters on few trades, a classic overfitting pattern. Any straddle on the Live page is a paper record only.</p>`
+  },
+  {
+    date: '2026-05-27', type: 'RESEARCH', badge: 'warn',
+    title: 'Weekly directional options (figures withdrawn)',
+    summary: 'The direction signal was real, but option time decay erased the edge and the signal combination was chosen on the same data. Earlier Sharpe figures are withdrawn; the Backtest page computes statistics directly from the trade log.',
+    body: `<p>Tuesday-close exits beat Thursday-close exits across the combinations tested.</p>`
   },
 ];
 
 const feed = document.getElementById('news-feed');
 
-// Load live report first
-loadMarkdown('data/live/reports/2026-05-30.md').then(md => {
-  renderAll(md);
-}).catch(() => renderAll(null));
+loadMarkdown('data/live/reports/latest.md')
+  .then(md => renderAll(md, null))
+  .catch(err => renderAll(null, err));
 
-function renderAll(reportMd) {
-  const items = [];
-
+function renderAll(reportMd, reportErr) {
+  const items = [...MILESTONES];
   if (reportMd) {
-    items.push({
-      date: '2026-05-30', type: 'REPORT', badge: 'active',
-      title: 'Daily Report — 2026-05-30',
-      summary: 'Automated daily portfolio report. Paper trader active. Sector: cnxenergy 2×. Options: IDLE. Straddle: blocked.',
-      body: `<div class="report-content">${renderMarkdown(reportMd)}</div>`
+    const m = reportMd.match(/\d{4}-\d{2}-\d{2}/);
+    const when = m ? fmtDayMonthYear(m[0]) : 'date unknown';
+    items.splice(1, 0, {
+      date: m ? m[0] : 'date unknown', type: 'REPORT', badge: 'idle', html: true,
+      title: 'Paper-trading report, ' + when,
+      summary: 'Automated daily report from the paper trader, dated ' + when + '. Paper only. The straddle sub-account is frozen: it failed out-of-sample.',
+      body: '<p class="report-date">Report date: <strong>' + esc(m ? m[0] : 'unknown') + '</strong></p>' +
+        '<div class="report-content">' + markFrozenStraddle(renderMarkdown(reportMd)) + '</div>'
     });
   }
 
-  items.push(...MILESTONES);
-
   feed.innerHTML = items.map((item, i) => `
-    <div class="news-card" onclick="toggleCard(${i})">
-      <div class="news-card-header">
-        <span class="news-date">${item.date}</span>
-        <span class="badge ${item.badge}">${item.type}</span>
-      </div>
-      <h3>${item.title}</h3>
-      <p>${item.summary}</p>
-      <div class="news-body" id="news-body-${i}">${item.body}</div>
+    <div class="news-card${item.type === 'REPORT' ? ' news-report' : ''}">
+      <h3 class="news-head">
+        <button type="button" class="news-toggle" aria-expanded="${i === 0}" aria-controls="news-body-${i}">
+          <span class="news-card-header">
+            <span class="news-date">${esc(item.date)}</span>
+            <span class="badge ${esc(item.badge)}">${esc(item.type)}</span>
+          </span>
+          <span class="news-title">${esc(item.title)}</span>
+          <span class="news-summary">${esc(item.summary)}</span>
+        </button>
+      </h3>
+      <div class="news-body${i === 0 ? ' open' : ''}" id="news-body-${i}">${item.body}</div>
     </div>
   `).join('');
+  feed.querySelectorAll('.news-toggle').forEach(btn => btn.addEventListener('click', () => toggleCard(btn)));
+
+  if (reportErr) {
+    feed.insertAdjacentHTML('afterbegin', '<div id="report-error"></div>');
+    loadError(document.getElementById('report-error'), 'latest paper-trading report', reportErr);
+  }
+
+  loadHeadline().then(h => {
+    document.getElementById('news-headline').innerHTML =
+      '<p><strong>' + esc(headlineBasis(h)) + '</strong></p><table><tbody>' +
+      headlineCells(h).map(c => '<tr><td>' + esc(c.label) + '</td><td>' + esc(c.value) + '</td><td>' + esc(c.sub) + '</td></tr>').join('') +
+      '</tbody></table><p>' + esc(headlineVerdict(h) + ' ' + headlineEvidence(h)) + '</p>';
+  }).catch(err => headlineError(document.getElementById('news-headline'), err));
 }
 
-function toggleCard(i) {
-  const body = document.getElementById('news-body-' + i);
-  if (body) body.classList.toggle('open');
+function toggleCard(btn) {
+  const body = document.getElementById(btn.getAttribute('aria-controls'));
+  if (!body) return;
+  const open = body.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(open));
 }
 </script>
 </body>
